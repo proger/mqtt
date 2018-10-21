@@ -1,5 +1,5 @@
 -module(n2o_json).
--compile([format/1]).
+-export([format/1]).
 
 format({Io,Eval,Data}) ->
     n2o:info(?MODULE,"{~p,_,_}: ~tp~n",[Io,Eval]),

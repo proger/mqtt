@@ -24,7 +24,7 @@ check(#mqtt_client{client_id = ClientId,
 check(_Client, _Password, _Opts) -> ignore.
 
 ttl() -> (application:get_env(n2o, auth_ttl, 60*15)).
-gen_token([], Data) ->
+gen_token([], _Data) ->
     Now = now_msec(),
     Expiration = Now+ttl()*1000,
     {'Token', n2o_secret:pickle(term_to_binary(Expiration))};
@@ -33,7 +33,7 @@ gen_token(ClientSessionToken, Data) ->
     case bin_to_term(n2o_secret:depickle(ClientSessionToken)) of
         <<>> -> {error, invalid_token};
         Expiration when Expiration > Now -> {'Token', ClientSessionToken};
-        Expiration -> gen_token([], Data)
+        _Expiration -> gen_token([], Data)
     end.
 
 bin_to_term(<<>>) -> <<>>;

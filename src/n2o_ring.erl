@@ -76,7 +76,7 @@ set_opaque({Name, Opaque}) ->
     {ok, #state{ring=NewRing,nodes=NewNodes}}.
 
 init(Peers) ->
-    X = lists:sum([ C||{_,_,C} <- Peers]),
+    _ = lists:sum([ C||{_,_,C} <- Peers]),
     RawRing = lists:keysort(1,
         [ begin 
             {H, {Node, Opaque}} end || {Node, Opaque, Weight} <- Peers,

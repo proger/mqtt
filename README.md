@@ -1,6 +1,8 @@
 N2O: Protocol Server 4.9.3 for MQTT
 ===================================
 
+[![Build Status](https://travis-ci.org/synrc/mqtt.svg?branch=master)](https://travis-ci.org/synrc/mqtt)
+
 Features
 --------
 

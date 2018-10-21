@@ -44,7 +44,7 @@ proc({publish, To, Request},
     Addr   = emqttd_topic:words(To),
     Bert   = binary_to_term(Request,[safe]),
     Return = case Addr of
-        [ Origin, Vsn, Node, Module, Username, Id, Token | _ ] ->
+        [ _Origin, Vsn, Node, Module, _Username, Id, Token | _ ] ->
         From = nitro:to_binary(["actions/", Vsn, "/", Module, "/", Id]),
         Sid  = nitro:to_binary(Token),
         Ctx  = #cx { module=fix(Module), session=Sid, node=Node,
@@ -69,6 +69,6 @@ proc({mqttc, C, connected}, State=#handler{name=Name,state=C,seq=S}) ->
     emqttc:subscribe(C, nitro:to_binary([<<"events/+/">>, nitro:to_list(Name),"/#"]), 2),
     {ok, State#handler{seq = S+1}};
 
-proc(Unknown,#handler{state=C,name=Name,seq=S}=Async) ->
+proc(Unknown,#handler{seq=S}=Async) ->
 %    io:format("VNODE ~p Unknown Message: ~p\r~n",[Name,Unknown]),
     {reply,{uknown,Unknown,S},Async#handler{seq=S+1}}.

@@ -31,7 +31,7 @@ stop(_)    -> unload(), ok.
 start(_,_) -> catch load([]), X = supervisor:start_link({local,n2o},n2o, []),
               n2o_async:start(#handler{module=?MODULE,class=caching,group=n2o,state=[],name="timer"}),
               [ n2o_async:start(#handler{module=n2o_vnode,class=ring,group=n2o,state=[],name=Pos})
-                || {{Name,Nodes},Pos} <- lists:zip(ring(),lists:seq(1,length(ring()))) ],
+                || {{_,_},Pos} <- lists:zip(ring(),lists:seq(1,length(ring()))) ],
                 X.
 ring()     -> n2o_ring:ring_list().
 ring_max() -> length(ring()).
@@ -57,33 +57,31 @@ bench_otp() -> N = run(), {T,_} = timer:tc(fun() ->
                 || X <- lists:seq(1,N) ], ok end),
            {otp,trunc(N*1000000/T),"msgs/s"}.
 
-on_client_connected(ConnAck, Client=#mqtt_client{client_id= <<"emqttc",_/bytes>>}, _) ->
+on_client_connected(_ConnAck, Client=#mqtt_client{client_id= <<"emqttc",_/bytes>>}, _) ->
    {ok, Client};
 
-on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId,
-                                                   client_pid = ClientPid,
-                                                   username   = Username}, Env) ->
+on_client_connected(_ConnAck, Client = #mqtt_client{}, _Env) ->
     {ok, Client}.
 
-on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _Env) ->
-%    io:format("client ~s disconnected, reason: ~w\r~n", [ClientId, Reason]),
+on_client_disconnected(_Reason, _Client = #mqtt_client{}, _Env) ->
+%    io:format("client ~s disconnected, reason: ~w\r~n", [ClientId, _Reason]),
     ok.
 
-on_client_subscribe(ClientId, _Username, TopicTable, _Env) ->
+on_client_subscribe(_ClientId, _Username, TopicTable, _Env) ->
 %    io:format("client subscribed ~p.\r~n", [TopicTable]),
     {ok, TopicTable}.
 
-on_client_unsubscribe(ClientId, _Username, TopicTable, _Env) ->
-%    io:format("client ~p unsubscribe ~p.\r~n", [ClientId, TopicTable]),
+on_client_unsubscribe(_ClientId, _Username, TopicTable, _Env) ->
+%    io:format("client ~p unsubscribe ~p.\r~n", [_ClientId, TopicTable]),
     {ok, TopicTable}.
 
-on_session_created(ClientId, _Username, _Env) ->
-%    io:format("session ~p created.\r~n", [ClientId]),
+on_session_created(_ClientId, _Username, _Env) ->
+%    io:format("session ~p created.\r~n", [_ClientId]),
     ok.
 
 
-on_session_subscribed(<<"emqttd",_/binary>> = ClientId,
-    Username, {<<"actions/",Vsn, "/",_/binary>> = Topic, Opts}, _Env) ->
+on_session_subscribed(<<"emqttd",_/binary>> = _ClientId,
+    _Username, {<<"actions/",_Vsn, "/",_/binary>> = Topic, Opts}, _Env) ->
 %    io:format("session ~p subscribed: ~p.\r~n", [ClientId, Topic]),
 %    {ring,VNode} = n2o_ring:lookup(ClientId),
 %    n2o_ring:send({publish,
@@ -92,43 +90,43 @@ on_session_subscribed(<<"emqttd",_/binary>> = ClientId,
     {ok, {Topic, Opts}};
 
 
-on_session_subscribed(ClientId, _Username, {Topic, Opts}, _Env) ->
-%    io:format("session ~p subscribed: ~p.\r~n", [ClientId, Topic]),
+on_session_subscribed(_ClientId, _Username, {Topic, Opts}, _Env) ->
+%    io:format("session ~p subscribed: ~p.\r~n", [_ClientId, Topic]),
     {ok, {Topic, Opts}}.
 
-on_session_unsubscribed(ClientId, _Username, {Topic, Opts}, _Env) ->
-%    io:format("session ~p unsubscribed: ~p.\r~n", [ClientId, {Topic, Opts}]),
+on_session_unsubscribed(_ClientId, _Username, {_Topic, _Opts}, _Env) ->
+%    io:format("session ~p unsubscribed: ~p.\r~n", [_ClientId, {Topic, Opts}]),
     ok.
 
-on_session_terminated(ClientId, _Username, _Reason, _Env) ->
-%    io:format("session ~p terminated.\r~n", [{ClientId,_Reason}]),
+on_session_terminated(_ClientId, _Username, _Reason, _Env) ->
+%    io:format("session ~p terminated.\r~n", [{_ClientId,_Reason}]),
     ok.
 
-on_message_publish(Message = #mqtt_message{topic = <<"actions/",
-                   _/binary>>,
-                   from=From}, _Env) ->
+on_message_publish(Message = #mqtt_message{topic = <<"actions/", _/binary>>, from=_From}, _Env) ->
     {ok, Message};
-
 
 on_message_publish(#mqtt_message{topic = <<"events/", _TopicTail/binary>> = Topic, qos=Qos,
     from={ClientId,_},payload = Payload}=Message, _Env) ->
     case emqttd_topic:words(Topic) of
-        [E,V,'',M,U,_C,T] -> {Mod,F} = application:get_env(?MODULE, vnode, {?MODULE, get_vnode}),
+        [E,V,'',M,U,_C,T] ->
+            {Mod,F} = application:get_env(?MODULE, vnode, {?MODULE, get_vnode}),
             NewTopic = emqttd_topic:join([E,V,Mod:F(ClientId,Payload),M,U,ClientId,T]),
-            emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)), skip; %% @NOTE redirect to vnode
-        [E,V,N,M,U,ClientId,T] -> {ok, Message};
-        [E,V,N,M,U,_C,T] -> NewTopic = emqttd_topic:join([E,V,N,M,U,ClientId,T]),
-            emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)), skip; %% @NOTE redirects to event topic with correct ClientId
+            emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)),
+            skip; %% @NOTE redirect to vnode
+%        [E,V,N,M,U,_,T] -> NewTopic = emqttd_topic:join([E,V,N,M,U,ClientId,T]),
+%                           emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)),
+%                           skip; %% @NOTE redirects to event topic with correct ClientId
+        [_,_,_,_,_,_,_] -> {ok, Message};
         _ -> {ok, Message} end;
 
 on_message_publish(Message, _) ->
     {ok,Message}.
 
-on_message_delivered(ClientId, _Username, Message, _Env) ->
+on_message_delivered(_ClientId, _Username, Message, _Env) ->
     {ok,Message}.
 
-on_message_acked(ClientId, _Username, Message, _Env) ->
-%    io:format("client ~p acked.\r~n",[ClientId]),
+on_message_acked(_ClientId, _Username, Message, _Env) ->
+%    io:format("client ~p acked.\r~n",[_ClientId]),
     {ok,Message}.
 
 unload() ->
@@ -299,12 +297,13 @@ unsubscribe_cli(ClientId, TopicTable)->
              kvs:delete(mqtt_subproperty, {Topic, ClientId}),
              mnesia:delete_object({mqtt_subscriber, Topic, ClientId})
             %emqttd_pubsub:del_subscriber(Topic,ClientId,[{qos,Qos}])
-            end || {Topic,Qos} <- TopicTable ] end,
+            end || {Topic,_Qos} <- TopicTable ] end,
     case mnesia:is_transaction() of
         true  -> DelFun();
         false -> mnesia:transaction(DelFun)
     end,
-    [(not ets:member(mqtt_subscriber, Topic)) andalso emqttd_router:del_route(Topic) || {Topic,Qos} <- TopicTable ].
+    [(not ets:member(mqtt_subscriber, Topic)) andalso
+      emqttd_router:del_route(Topic) || {Topic,_Qos} <- TopicTable ].
 
 
 get_vnode(ClientId) -> get_vnode(ClientId, []).

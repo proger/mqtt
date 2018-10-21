@@ -17,7 +17,7 @@ authenticate(ClientSessionId, ClientSessionToken) ->
             SessionId = decode_token(ClientSessionToken),
             case SessionId of
                 [] -> {error, "Invalid token signature"};
-                Val ->
+                _Val ->
                  Lookup = lookup_ets({SessionId,<<"auth">>}),
                  InnerResponse = case Lookup of
                     [] -> {error, "Invalid authentication token"};

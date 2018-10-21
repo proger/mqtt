@@ -11,7 +11,7 @@ info({init, <<>>}, Req, State = #cx{session = Session}) ->
     {'Token', Token} = n2o_auth:gen_token([], Session),
     info({init, Token}, Req, State);
 
-info({init, Token}, Req, State = #cx{module = Module, session = Session}) ->
+info({init, Token}, Req, State = #cx{module = Module, session = _Session}) ->
     case try Elements = Module:main(),
              n2o:render(Elements),
              {ok,[]}
@@ -19,16 +19,16 @@ info({init, Token}, Req, State = #cx{module = Module, session = Session}) ->
              io:format("Event Main: ~p:~p~n~p", Stack),
              {error,Stack} end of
         {ok, _} ->
-             UserCx = try Module:event(init)
+             _UserCx = try Module:event(init)
              catch C:E -> Error = n2o:stack(C,E),
                           io:format("Event Init: ~p:~p~n~p~n",Error),
                           {stack,Error} end,
                      {reply, {bert,{io,render_actions(n2o:actions()), {'Token', Token}}},Req,State};
         {error,E} -> {reply, {bert,{io,<<>>,E}},Req,State} end;
 
-info({client,Id,Topic,Message}=Client, Req, State) ->
+info({client,_Id,_Topic,_Message}=Client, Req, State) ->
     Module = State#cx.module,
-    Reply = try Module:event(Client)
+    _Reply = try Module:event(Client)
           catch E:R -> Error = n2o:stack(E,R),
                        io:format("Catch: ~p:~p~n~p",Error), Error end,
     {reply,{bert,{io,render_actions(n2o:actions()),<<>>}},Req,State};
@@ -49,12 +49,11 @@ info({flush,Actions}, Req, State) ->
 info({direct,Message}, Req, State) ->
     n2o:actions([]),
     Module = State#cx.module,
-    Result = try Res = Module:event(Message), {direct,Res}
+    _Result = try Res = Module:event(Message), {direct,Res}
            catch E:R -> Stack = n2o:stack(E, R),
                         io:format("Catch: ~p:~p~n~p", Stack),
                         {stack,Stack} end,
-    {reply,n2o:format({io,render_actions(n2o:actions()),<<>>}),
-           Req,State};
+    {reply,n2o:format({io,render_actions(n2o:actions()),<<>>}), Req,State};
 
 info(Message,Req,State) -> {unknown,Message,Req,State}.
 
@@ -69,7 +68,7 @@ render_actions(Actions) ->
 
 % n2o events
 
-html_events({pickle,Source,Pickled,Linked}=Pickle, State) ->
+html_events({pickle,Source,Pickled,Linked}, State) ->
     Ev = n2o:depickle(Pickled),
     case Ev of
          #ev{} -> render_ev(Ev,Source,Linked,State);
