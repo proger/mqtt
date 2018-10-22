@@ -1,4 +1,4 @@
-N2O: Protocol Server 4.9.3 for MQTT
+N2O: Protocol Server 5.10 for MQTT
 ===================================
 
 [![Build Status](https://travis-ci.org/synrc/mqtt.svg?branch=master)](https://travis-ci.org/synrc/mqtt)
@@ -60,5 +60,6 @@ History
 * 4.7 — DHT supervised node for server MQTT connections
 * 4.9 — Subscribe offline clients
 * 4.9.3 — Cleaned n2o_async, written manpage
+* 5.10 - Cleanup
 
 OM A HUM
