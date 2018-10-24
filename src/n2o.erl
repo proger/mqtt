@@ -30,8 +30,8 @@ load(Env) ->
 stop(_)    -> unload(), ok.
 start(_,_) -> catch load([]), X = supervisor:start_link({local,n2o},n2o, []),
               n2o_async:start(#handler{module=?MODULE,class=caching,group=n2o,state=[],name="timer"}),
-              [ n2o_async:start(#handler{module=n2o_vnode,class=ring,group=n2o,state=[],name=Pos})
-                || {{_,_},Pos} <- lists:zip(ring(),lists:seq(1,length(ring()))) ],
+              [ n2o_async:start(#handler{module=n2o_vnode,class=ring,group=n2o,state=[],name=n2o_vnode:gen_name(Pos)})
+                || {{Name,Nodes},Pos} <- lists:zip(ring(),lists:seq(1,length(ring()))) ],
                 X.
 ring()     -> n2o_ring:ring_list().
 ring_max() -> length(ring()).
@@ -302,8 +302,9 @@ unsubscribe_cli(ClientId, TopicTable)->
         true  -> DelFun();
         false -> mnesia:transaction(DelFun)
     end,
-    [(not ets:member(mqtt_subscriber, Topic)) andalso
-      emqttd_router:del_route(Topic) || {Topic,_Qos} <- TopicTable ].
+      [(not ets:member(mqtt_subscriber, Topic)) andalso
+          [emqttd_router:del_route(Route)|| Route<-mnesia:dirty_read({mqtt_route, Topic})] || {Topic,Qos} <- TopicTable ].
+
 
 
 get_vnode(ClientId) -> get_vnode(ClientId, []).
