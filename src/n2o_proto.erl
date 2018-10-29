@@ -28,7 +28,7 @@ init(_Transport, Req, _Opts, _) ->
     Ctx  = #cx { req=Req },
     put(context,Ctx),
     {Origin, _} = cowboy_req:header(<<"origin">>, Req, <<"*">>),
-    ConfigOrigin = nitro:to_binary(application:get_env(n2o,origin,Origin)),
+    ConfigOrigin = iolist_to_binary(application:get_env(n2o,origin,Origin)),
     Req1 = cowboy_req:set_resp_header(<<"Access-Control-Allow-Origin">>, ConfigOrigin, Ctx#cx.req),
     {ok, Req1, Ctx}.
 

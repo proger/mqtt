@@ -43,7 +43,7 @@ info({pickle,_,_,_}=Event, Req, State) ->
 
 info({flush,Actions}, Req, State) ->
     n2o:actions([]),
-    Render = iolist_to_binary(render_actions(Actions)),
+    Render = iolist_to_binary([render_actions(Actions)]),
     {reply,n2o:format({io,Render,<<>>}),Req, State};
 
 info({direct,Message}, Req, State) ->
@@ -79,5 +79,5 @@ render_ev(#ev{name=F,msg=P,trigger=T},_Source,Linked,State) ->
     #cx{module=M} = erlang:get(context),
     case F of
          api_event -> M:F(P,Linked,State);
-         event -> lists:map(fun({K,V})-> erlang:put(K,nitro:to_binary(V)) end,Linked), M:F(P);
+         event -> lists:map(fun({K,V})-> erlang:put(K,iolist_to_binary([V])) end,Linked), M:F(P);
          _UserCustomEvent -> M:F(P,T,State) end.

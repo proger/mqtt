@@ -1,10 +1,7 @@
 -module(n2o_secret).
 -description('N2O Security: HMAC AES/CBC-128').
--license('ISC').
--author('Oleksandr Nikitin').
 -include("n2o.hrl").
--compile(export_all).
--export(?PICKLES_API).
+-export([pickle/1,depickle/1]).
 
 pickle(Data) ->
     Message = term_to_binary({Data,os:timestamp()}),
@@ -18,7 +15,7 @@ secret() -> application:get_env(n2o,secret,<<"ThisIsClassified">>).
 
 depickle(PickledData) ->
     try Key = secret(),
-        Decoded = nitro_conv:unhex(nitro:to_binary(PickledData)),
+        Decoded = nitro_conv:unhex(iolist_to_binary(PickledData)),
         <<IV:16/binary,Signature:32/binary,Cipher/binary>> = Decoded,
         Signature = crypto:hmac(sha256,Key,<<Cipher/binary,IV/binary>>),
         {Data,_Time} = binary_to_term(crypto:block_decrypt(aes_cbc128,Key,IV,Cipher),[safe]),

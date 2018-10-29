@@ -53,7 +53,6 @@ expired(_Issued,Till) -> Till < calendar:local_time().
 
 lookup_ets(Key) ->
     Res = ets:lookup(cookies,Key),
-%    io:format("Lookup ETS: ~p~n",[{Res,Key}]),
     case Res of
          [] -> [];
          [Value] -> Value;
@@ -61,8 +60,6 @@ lookup_ets(Key) ->
 
 delete_old_token(Session) ->
     ets:delete_object(cookies, lookup_ets(Session)).
-%    [ ets:delete(cookies,X) || X <- ets:select(cookies,
-%        ets:fun2ms(fun(A) when (element(1,element(1,A)) == Session) -> element(1,A) end)) ].
 
 ttl() -> application:get_env(n2o,ttl,60*15).
 

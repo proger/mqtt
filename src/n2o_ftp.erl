@@ -12,7 +12,7 @@
 
 % Callbacks
 
-filename(#ftp{sid=_Sid,filename=FileName}) -> FileName. %filename:join(nitro:to_list(Sid),FileName).
+filename(#ftp{sid=_Sid,filename=FileName}) -> FileName. %filename:join(lists:concat([Sid]),FileName).
 
 % File Transfer Protocol
 

@@ -1,7 +1,8 @@
 -module(n2o_bert).
 -include("n2o.hrl").
--export([format/1]).
+-export([encode/1,decode/1]).
 
-format(#ftp{}=FTP) -> term_to_binary(setelement(1,FTP,ftpack));
-format(Term)       -> term_to_binary(Term).
+encode(#ftp{}=FTP) -> term_to_binary(setelement(1,FTP,ftpack));
+encode(Term)       -> term_to_binary(Term).
+decode(Bin)        -> binary_to_term(Bin,[safe]).
 

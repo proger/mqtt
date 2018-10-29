@@ -46,16 +46,16 @@ init([])   -> storage_init(),
 bench() -> [bench_mqtt(),bench_otp()].
 run()   -> 10000.
 
-bench_mqtt() -> N = run(), {T,_} = timer:tc(fun() -> [ begin Y = nitro:to_list(X rem 16), 
+bench_mqtt() -> N = run(), {T,_} = timer:tc(fun() -> [ begin Y = lists:concat([X rem 16]),
     n2o:send_reply(<<"clientId">>,iolist_to_binary(["events/1/",Y]),term_to_binary(X))
                                end || X <- lists:seq(1,N) ], ok end),
            {mqtt,trunc(N*1000000/T),"msgs/s"}.
 
 bench_otp() -> N = run(), {T,_} = timer:tc(fun() ->
-     [ n2o_ring:send({publish, nitro:to_binary("events/1/" ++ nitro:to_list((X rem length(n2o:ring())) + 1) ++
-                 "/index/anon/room/"), term_to_binary(X)})
-                || X <- lists:seq(1,N) ], ok end),
-           {otp,trunc(N*1000000/T),"msgs/s"}.
+     [ n2o_ring:send({publish, iolist_to_binary(["events/1/",
+              lists:concat([(X rem length(n2o:ring())) + 1]),"/index/anon/room/"]),
+                      term_to_binary(X)}) || X <- lists:seq(1,N) ], ok end),
+     {otp,trunc(N*1000000/T),"msgs/s"}.
 
 on_client_connected(_ConnAck, Client=#mqtt_client{client_id= <<"emqttc",_/bytes>>}, _) ->
    {ok, Client};
@@ -64,42 +64,29 @@ on_client_connected(_ConnAck, Client = #mqtt_client{}, _Env) ->
     {ok, Client}.
 
 on_client_disconnected(_Reason, _Client = #mqtt_client{}, _Env) ->
-%    io:format("client ~s disconnected, reason: ~w\r~n", [ClientId, _Reason]),
     ok.
 
 on_client_subscribe(_ClientId, _Username, TopicTable, _Env) ->
-%    io:format("client subscribed ~p.\r~n", [TopicTable]),
     {ok, TopicTable}.
 
 on_client_unsubscribe(_ClientId, _Username, TopicTable, _Env) ->
-%    io:format("client ~p unsubscribe ~p.\r~n", [_ClientId, TopicTable]),
     {ok, TopicTable}.
 
 on_session_created(_ClientId, _Username, _Env) ->
-%    io:format("session ~p created.\r~n", [_ClientId]),
     ok.
-
 
 on_session_subscribed(<<"emqttd",_/binary>> = _ClientId,
     _Username, {<<"actions/",_Vsn, "/",_/binary>> = Topic, Opts}, _Env) ->
-%    io:format("session ~p subscribed: ~p.\r~n", [ClientId, Topic]),
-%    {ring,VNode} = n2o_ring:lookup(ClientId),
-%    n2o_ring:send({publish,
-%        iolist_to_binary(["events/",Vsn,"/",integer_to_list(VNode, 10),"/",Username,"/anon/",ClientId,"/"]),
-%        term_to_binary({vnode_max, ring_max()})}),
     {ok, {Topic, Opts}};
 
 
 on_session_subscribed(_ClientId, _Username, {Topic, Opts}, _Env) ->
-%    io:format("session ~p subscribed: ~p.\r~n", [_ClientId, Topic]),
     {ok, {Topic, Opts}}.
 
 on_session_unsubscribed(_ClientId, _Username, {_Topic, _Opts}, _Env) ->
-%    io:format("session ~p unsubscribed: ~p.\r~n", [_ClientId, {Topic, Opts}]),
     ok.
 
 on_session_terminated(_ClientId, _Username, _Reason, _Env) ->
-%    io:format("session ~p terminated.\r~n", [{_ClientId,_Reason}]),
     ok.
 
 on_message_publish(Message = #mqtt_message{topic = <<"actions/", _/binary>>, from=_From}, _Env) ->
@@ -112,10 +99,7 @@ on_message_publish(#mqtt_message{topic = <<"events/", _TopicTail/binary>> = Topi
             {Mod,F} = application:get_env(?MODULE, vnode, {?MODULE, get_vnode}),
             NewTopic = emqttd_topic:join([E,V,Mod:F(ClientId,Payload),M,U,ClientId,T]),
             emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)),
-            skip; %% @NOTE redirect to vnode
-%        [E,V,N,M,U,_,T] -> NewTopic = emqttd_topic:join([E,V,N,M,U,ClientId,T]),
-%                           emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)),
-%                           skip; %% @NOTE redirects to event topic with correct ClientId
+            skip;
         [_,_,_,_,_,_,_] -> {ok, Message};
         _ -> {ok, Message} end;
 
@@ -126,7 +110,6 @@ on_message_delivered(_ClientId, _Username, Message, _Env) ->
     {ok,Message}.
 
 on_message_acked(_ClientId, _Username, Message, _Env) ->
-%    io:format("client ~p acked.\r~n",[_ClientId]),
     {ok,Message}.
 
 unload() ->
@@ -153,27 +136,21 @@ reg(X,Y) ->
 
 % Pickling n2o:pickle/1
 
--ifndef(PICKLER).
--define(PICKLER, (application:get_env(n2o,pickler,n2o_secret))).
--endif.
-
-pickle(Data) -> ?PICKLER:pickle(Data).
-depickle(SerializedData) -> ?PICKLER:depickle(SerializedData).
+pickler() -> application:get_env(n2o,pickler,n2o_secret).
+pickle(Data) -> (pickler()):pickle(Data).
+depickle(SerializedData) -> (pickler()):depickle(SerializedData).
 
 % Error handler n2o:error/2 n2o:stack/2
 
--ifndef(ERRORING).
--define(ERRORING, (application:get_env(n2o,erroring,n2o))).
--endif.
-
-stack(Error, Reason) -> ?ERRORING:stack_trace(Error, Reason).
-erroring(Class, Error) -> ?ERRORING:error_page(Class, Error).
+erroring() -> application:get_env(n2o,erroring,n2o).
+stack(Error, Reason) -> (erroring()):stack_trace(Error, Reason).
+erroring(Class, Error) -> (erroring()):error_page(Class, Error).
 
 % Formatter
 
--define(FORMAT, (application:get_env(n2o,formatter,n2o_bert))).
-
-format(Term) -> ?FORMAT:format(Term).
+formatter() -> application:get_env(n2o,formatter,n2o_bert).
+encode(Term) -> (formatter()):encode(Term).
+decode(Term) -> (formatter()):decode(Term).
 
 % Cache facilities n2o:cache/[1,2,3]
 
@@ -198,10 +175,6 @@ till(Now,TTL) ->
     calendar:gregorian_seconds_to_datetime(
         calendar:datetime_to_gregorian_seconds(Now) + TTL), infinity.
 
--ifndef(CACHING).
--define(CACHING, (application:get_env(n2o,caching,n2o))).
--endif.
-
 opt()      -> [ set, named_table, { keypos, 1 }, public ].
 tables()   -> application:get_env(n2o,tables,[ cookies, file, caching, ring, async ]).
 storage_init()   -> [ ets:new(X,opt()) || X <- tables() ].
@@ -221,7 +194,7 @@ cache(Tab, Key) ->
 
 q(Key) -> Val = get(Key), case Val of undefined -> qc(Key); A -> A end.
 qc(Key) -> CX = get(context), qc(Key,CX).
-qc(Key,Ctx) -> proplists:get_value(iolist_to_binary(Key),Ctx#cx.params).
+qc(Key,Ctx) -> proplists:get_value(iolist_to_binary([Key]),Ctx#cx.params).
 
 atom(List) when is_list(List) -> list_to_atom(string:join([ lists:concat([L]) || L <- List],"_"));
 atom(Scalar) -> list_to_atom(lists:concat([Scalar])).
@@ -267,14 +240,10 @@ error_page(Class,Error) ->
         [ Module,Function,Arity,proplists:get_value(line, Location) ])
     ||  { Module,Function,Arity,Location} <- erlang:get_stacktrace() ].
 
-
--ifndef(SESSION).
--define(SESSION, (application:get_env(n2o,session,n2o_session))).
--endif.
-
-session(Key)        -> #cx{session=SID}=get(context), ?SESSION:get_value(SID, Key, []).
-session(Key, Value) -> #cx{session=SID}=get(context), ?SESSION:set_value(SID, Key, Value).
-user()              -> case session(user) of undefined -> []; E -> nitro:to_list(E) end.
+session() -> application:get_env(n2o,session,n2o_session).
+session(Key)        -> #cx{session=SID}=get(context), (session()):get_value(SID, Key, []).
+session(Key, Value) -> #cx{session=SID}=get(context), (session()):set_value(SID, Key, Value).
+user()              -> case session(user) of undefined -> []; E -> lists:concat([E]) end.
 user(User)          -> session(user,User).
 
 subscribe(X,Y) -> subscribe(X,Y,[{qos,2}]).
@@ -290,13 +259,11 @@ subscribe_cli(ClientId, TopicTable) ->
         emqttd_pubsub:add_subscriber(Topic,ClientId,[{qos,Qos}])
       end || {Topic,Qos} <- TopicTable ].
 
-
 unsubscribe_cli(ClientId, TopicTable)->
     DelFun = fun() -> [ begin
              mnesia:delete_object({mqtt_subscription, ClientId, Topic}),
              kvs:delete(mqtt_subproperty, {Topic, ClientId}),
              mnesia:delete_object({mqtt_subscriber, Topic, ClientId})
-            %emqttd_pubsub:del_subscriber(Topic,ClientId,[{qos,Qos}])
             end || {Topic,_Qos} <- TopicTable ] end,
     case mnesia:is_transaction() of
         true  -> DelFun();
@@ -305,7 +272,6 @@ unsubscribe_cli(ClientId, TopicTable)->
     [(not ets:member(mqtt_subscriber, Topic)) andalso
       emqttd_router:del_route(Topic) || {Topic,_Qos} <- TopicTable ].
 
-
 get_vnode(ClientId) -> get_vnode(ClientId, []).
 get_vnode(ClientId, _) ->
     [H|_] = binary_to_list(erlang:md5(ClientId)),
@@ -313,36 +279,25 @@ get_vnode(ClientId, _) ->
 
 % Tiny Logging Framework
 
--define(LOGGER, n2o_io).
+logger()       -> application:get_env(?MODULE,logger,n2o_io).
+log_modules()  -> application:get_env(?MODULE,log_modules,[]).
+log_level()    -> application:get_env(?MODULE,log_level,info).
 
-log_modules() -> [?MODULE].
-log_level() -> info.
+level(none)    -> 3;
+level(error)   -> 2;
+level(warning) -> 1;
+level(_)       -> 0.
 
--define(LOG_MODULES, (application:get_env(n2o,log_modules,n2o))).
--define(LOG_LEVEL,   (application:get_env(n2o,log_level,n2o))).
+log(M,F,A,Fun) ->
+    case level(Fun) < level(log_level()) of
+         true  -> skip;
+         false -> case    log_modules() of
+             any       -> (logger()):Fun(M,F,A);
+             Allowed   -> case lists:member(M, Allowed) of
+                 true  -> (logger()):Fun(M,F,A);
+                 false -> skip end end end.
 
-log_level(none) -> 3;
-log_level(error) -> 2;
-log_level(warning) -> 1;
-log_level(_) -> 0.
-
-log(Module, String, Args, Fun) ->
-    case log_level(Fun) < log_level(?LOG_LEVEL:log_level()) of
-        true -> skip;
-        false -> case ?LOG_MODULES:log_modules() of
-            any -> ?LOGGER:Fun(Module, String, Args);
-            Allowed -> case lists:member(Module, Allowed) of
-                true -> ?LOGGER:Fun(Module, String, Args);
-                false -> skip end end end.
-
-info(Module, String, Args) -> log(Module,  String, Args, info).
-info(        String, Args) -> log(?MODULE, String, Args, info).
-info(        String      ) -> log(?MODULE, String, [],   info).
-
+info   (Module, String, Args) -> log(Module,  String, Args, info).
 warning(Module, String, Args) -> log(Module,  String, Args, warning).
-warning(        String, Args) -> log(?MODULE, String, Args, warning).
-warning(        String      ) -> log(?MODULE, String, [],   warning).
+error  (Module, String, Args) -> log(Module,  String, Args, error).
 
-error(Module, String, Args) -> log(Module,  String, Args, error).
-error(        String, Args) -> log(?MODULE, String, Args, error).
-error(        String)       -> log(?MODULE, String, [],   error).

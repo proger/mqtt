@@ -1,5 +1,5 @@
 -module(n2o_stream).
--description('N2O Stream Bridge to WebSocket or XHR channels').
+-description('N2O WebSocket and XHR channels').
 -behaviour(cowboy_http_handler).
 -behaviour(cowboy_websocket_handler).
 -export([init/3,handle/2,info/3,terminate/3]).
