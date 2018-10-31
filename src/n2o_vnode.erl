@@ -25,7 +25,7 @@ fix(<<"index">>) -> index;
 fix(Module)      -> list_to_atom(binary_to_list(Module)).
 
 gen_name(Pos) when is_integer(Pos) -> gen_name(integer_to_list(Pos));
-gen_name(Pos) -> iolist_to_binary([lists:flatten([io_lib:format("~2.16.0b",[X])
+gen_name(Pos) -> n2o:to_binary([lists:flatten([io_lib:format("~2.16.0b",[X])
               || <<X:8>> <= list_to_binary(atom_to_list(node())++"_"++Pos)])]).
 
 proc(init,#handler{name=Name}=Async) ->
@@ -43,8 +43,8 @@ proc({publish, To, Request},
     Bert   = n2o:decode(Request),
     Return = case Addr of
         [ _Origin, Vsn, Node, Module, _Username, Id, Token | _ ] ->
-        From = iolist_to_binary([lists:concat(["actions/", Vsn, "/", Module, "/", Id])]),
-        Sid  = iolist_to_binary([lists:concat([Token])]),
+        From = n2o:to_binary(["actions/", Vsn, "/", Module, "/", Id]),
+        Sid  = n2o:to_binary(Token),
         Ctx  = #cx { module=fix(Module), session=Sid, node=Node,
                      params=Id, client_pid=C, from = From, vsn = Vsn},
         put(context, Ctx),
@@ -65,7 +65,7 @@ proc({publish, To, Request},
     {reply, Return, State#handler{seq=S+1}};
 
 proc({mqttc, C, connected}, State=#handler{name=Name,state=C,seq=S}) ->
-    emqttc:subscribe(C, iolist_to_binary([<<"events/+/">>, lists:concat([Name]),"/#"]), 2),
+    emqttc:subscribe(C, n2o:to_binary([<<"events/+/">>, lists:concat([Name]),"/#"]), 2),
     {ok, State#handler{seq = S+1}};
 
 proc(Unknown,#handler{seq=S}=Async) ->

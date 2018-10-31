@@ -47,12 +47,12 @@ bench() -> [bench_mqtt(),bench_otp()].
 run()   -> 10000.
 
 bench_mqtt() -> N = run(), {T,_} = timer:tc(fun() -> [ begin Y = lists:concat([X rem 16]),
-    n2o:send_reply(<<"clientId">>,iolist_to_binary(["events/1/",Y]),term_to_binary(X))
+    n2o:send_reply(<<"clientId">>,n2o:to_binary(["events/1/",Y]),term_to_binary(X))
                                end || X <- lists:seq(1,N) ], ok end),
            {mqtt,trunc(N*1000000/T),"msgs/s"}.
 
 bench_otp() -> N = run(), {T,_} = timer:tc(fun() ->
-     [ n2o_ring:send({publish, iolist_to_binary(["events/1/",
+     [ n2o_ring:send({publish, n2o:to_binary(["events/1/",
               lists:concat([(X rem length(n2o:ring())) + 1]),"/index/anon/room/"]),
                       term_to_binary(X)}) || X <- lists:seq(1,N) ], ok end),
      {otp,trunc(N*1000000/T),"msgs/s"}.
@@ -194,7 +194,7 @@ cache(Tab, Key) ->
 
 q(Key) -> Val = get(Key), case Val of undefined -> qc(Key); A -> A end.
 qc(Key) -> CX = get(context), qc(Key,CX).
-qc(Key,Ctx) -> proplists:get_value(iolist_to_binary([Key]),Ctx#cx.params).
+qc(Key,Ctx) -> proplists:get_value(n2o:to_binary([Key]),Ctx#cx.params).
 
 atom(List) when is_list(List) -> list_to_atom(string:join([ lists:concat([L]) || L <- List],"_"));
 atom(Scalar) -> list_to_atom(lists:concat([Scalar])).
@@ -300,4 +300,13 @@ log(M,F,A,Fun) ->
 info   (Module, String, Args) -> log(Module,  String, Args, info).
 warning(Module, String, Args) -> log(Module,  String, Args, warning).
 error  (Module, String, Args) -> log(Module,  String, Args, error).
+
+%%
+
+to_binary(A) when is_atom(A) -> atom_to_binary(A,latin1);
+to_binary(B) when is_binary(B) -> B;
+to_binary(T) when is_tuple(T) -> term_to_binary(T);
+to_binary(I) when is_integer(I) -> to_binary(integer_to_list(I));
+to_binary(F) when is_float(F) -> float_to_binary(F,[{decimals,9},compact]);
+to_binary(L) when is_list(L) ->  iolist_to_binary(L).
 
