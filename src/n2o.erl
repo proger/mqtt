@@ -46,16 +46,16 @@ init([])   -> storage_init(),
 bench() -> [bench_mqtt(),bench_otp()].
 run()   -> 10000.
 
-bench_mqtt() -> N = run(), {T,_} = timer:tc(fun() -> [ begin Y = nitro:to_list(X rem 16), 
-    n2o:send_reply(<<"clientId">>,iolist_to_binary(["events/1/",Y]),term_to_binary(X))
+bench_mqtt() -> N = run(), {T,_} = timer:tc(fun() -> [ begin Y = lists:concat([X rem 16]),
+    n2o:send_reply(<<"clientId">>,n2o:to_binary(["events/1/",Y]),term_to_binary(X))
                                end || X <- lists:seq(1,N) ], ok end),
            {mqtt,trunc(N*1000000/T),"msgs/s"}.
 
 bench_otp() -> N = run(), {T,_} = timer:tc(fun() ->
-     [ n2o_ring:send({publish, nitro:to_binary("events/1/" ++ nitro:to_list((X rem length(n2o:ring())) + 1) ++
-                 "/index/anon/room/"), term_to_binary(X)})
-                || X <- lists:seq(1,N) ], ok end),
-           {otp,trunc(N*1000000/T),"msgs/s"}.
+     [ n2o_ring:send({publish, n2o:to_binary(["events/1/",
+              lists:concat([(X rem length(n2o:ring())) + 1]),"/index/anon/room/"]),
+                      term_to_binary(X)}) || X <- lists:seq(1,N) ], ok end),
+     {otp,trunc(N*1000000/T),"msgs/s"}.
 
 on_client_connected(_ConnAck, Client=#mqtt_client{client_id= <<"emqttc",_/bytes>>}, _) ->
    {ok, Client};
@@ -108,15 +108,14 @@ on_message_publish(Message = #mqtt_message{topic = <<"actions/", _/binary>>, fro
 on_message_publish(#mqtt_message{topic = <<"events/", _TopicTail/binary>> = Topic, qos=Qos,
     from={ClientId,_},payload = Payload}=Message, _Env) ->
     case emqttd_topic:words(Topic) of
-        [E,V,'',M,U,_C,T] ->
-            {Mod,F} = application:get_env(?MODULE, vnode, {?MODULE, get_vnode}),
+        [E,V,'',M,U,_C,T] -> {Mod,F} = application:get_env(?MODULE, vnode, {?MODULE, get_vnode}),
             NewTopic = emqttd_topic:join([E,V,Mod:F(ClientId,Payload),M,U,ClientId,T]),
-            emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)),
-            skip; %% @NOTE redirect to vnode
-%        [E,V,N,M,U,_,T] -> NewTopic = emqttd_topic:join([E,V,N,M,U,ClientId,T]),
-%                           emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)),
-%                           skip; %% @NOTE redirects to event topic with correct ClientId
-        [_,_,_,_,_,_,_] -> {ok, Message};
+            emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)), skip;
+            %% @NOTE redirect to vnode
+        [E,V,N,M,U,ClientId,T] -> {ok, Message};
+        [E,V,N,M,U,_C,T] -> NewTopic = emqttd_topic:join([E,V,N,M,U,ClientId,T]),
+            emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)), skip;
+            %% @NOTE redirects to event topic with correct ClientId
         _ -> {ok, Message} end;
 
 on_message_publish(Message, _) ->
@@ -153,27 +152,21 @@ reg(X,Y) ->
 
 % Pickling n2o:pickle/1
 
--ifndef(PICKLER).
--define(PICKLER, (application:get_env(n2o,pickler,n2o_secret))).
--endif.
-
-pickle(Data) -> ?PICKLER:pickle(Data).
-depickle(SerializedData) -> ?PICKLER:depickle(SerializedData).
+pickler() -> application:get_env(n2o,pickler,n2o_secret).
+pickle(Data) -> (pickler()):pickle(Data).
+depickle(SerializedData) -> (pickler()):depickle(SerializedData).
 
 % Error handler n2o:error/2 n2o:stack/2
 
--ifndef(ERRORING).
--define(ERRORING, (application:get_env(n2o,erroring,n2o))).
--endif.
-
-stack(Error, Reason) -> ?ERRORING:stack_trace(Error, Reason).
-erroring(Class, Error) -> ?ERRORING:error_page(Class, Error).
+erroring() -> application:get_env(n2o,erroring,n2o).
+stack(Error, Reason) -> (erroring()):stack_trace(Error, Reason).
+erroring(Class, Error) -> (erroring()):error_page(Class, Error).
 
 % Formatter
 
--define(FORMAT, (application:get_env(n2o,formatter,n2o_bert))).
-
-format(Term) -> ?FORMAT:format(Term).
+formatter() -> application:get_env(n2o,formatter,n2o_bert).
+encode(Term) -> (formatter()):encode(Term).
+decode(Term) -> (formatter()):decode(Term).
 
 % Cache facilities n2o:cache/[1,2,3]
 
@@ -221,7 +214,7 @@ cache(Tab, Key) ->
 
 q(Key) -> Val = get(Key), case Val of undefined -> qc(Key); A -> A end.
 qc(Key) -> CX = get(context), qc(Key,CX).
-qc(Key,Ctx) -> proplists:get_value(iolist_to_binary(Key),Ctx#cx.params).
+qc(Key,Ctx) -> proplists:get_value(n2o:to_binary([Key]),Ctx#cx.params).
 
 atom(List) when is_list(List) -> list_to_atom(string:join([ lists:concat([L]) || L <- List],"_"));
 atom(Scalar) -> list_to_atom(lists:concat([Scalar])).
@@ -267,14 +260,10 @@ error_page(Class,Error) ->
         [ Module,Function,Arity,proplists:get_value(line, Location) ])
     ||  { Module,Function,Arity,Location} <- erlang:get_stacktrace() ].
 
-
--ifndef(SESSION).
--define(SESSION, (application:get_env(n2o,session,n2o_session))).
--endif.
-
-session(Key)        -> #cx{session=SID}=get(context), ?SESSION:get_value(SID, Key, []).
-session(Key, Value) -> #cx{session=SID}=get(context), ?SESSION:set_value(SID, Key, Value).
-user()              -> case session(user) of undefined -> []; E -> nitro:to_list(E) end.
+session() -> application:get_env(n2o,session,n2o_session).
+session(Key)        -> #cx{session=SID}=get(context), (session()):get_value(SID, Key, []).
+session(Key, Value) -> #cx{session=SID}=get(context), (session()):set_value(SID, Key, Value).
+user()              -> case session(user) of undefined -> []; E -> lists:concat([E]) end.
 user(User)          -> session(user,User).
 
 subscribe(X,Y) -> subscribe(X,Y,[{qos,2}]).
@@ -314,36 +303,34 @@ get_vnode(ClientId, _) ->
 
 % Tiny Logging Framework
 
--define(LOGGER, n2o_io).
+logger()       -> application:get_env(?MODULE,logger,n2o_io).
+log_modules()  -> application:get_env(?MODULE,log_modules,[]).
+log_level()    -> application:get_env(?MODULE,log_level,info).
 
-log_modules() -> [?MODULE].
-log_level() -> info.
+level(none)    -> 3;
+level(error)   -> 2;
+level(warning) -> 1;
+level(_)       -> 0.
 
--define(LOG_MODULES, (application:get_env(n2o,log_modules,n2o))).
--define(LOG_LEVEL,   (application:get_env(n2o,log_level,n2o))).
+log(M,F,A,Fun) ->
+    case level(Fun) < level(log_level()) of
+         true  -> skip;
+         false -> case    log_modules() of
+             any       -> (logger()):Fun(M,F,A);
+             Allowed   -> case lists:member(M, Allowed) of
+                 true  -> (logger()):Fun(M,F,A);
+                 false -> skip end end end.
 
-log_level(none) -> 3;
-log_level(error) -> 2;
-log_level(warning) -> 1;
-log_level(_) -> 0.
-
-log(Module, String, Args, Fun) ->
-    case log_level(Fun) < log_level(?LOG_LEVEL:log_level()) of
-        true -> skip;
-        false -> case ?LOG_MODULES:log_modules() of
-            any -> ?LOGGER:Fun(Module, String, Args);
-            Allowed -> case lists:member(Module, Allowed) of
-                true -> ?LOGGER:Fun(Module, String, Args);
-                false -> skip end end end.
-
-info(Module, String, Args) -> log(Module,  String, Args, info).
-info(        String, Args) -> log(?MODULE, String, Args, info).
-info(        String      ) -> log(?MODULE, String, [],   info).
-
+info   (Module, String, Args) -> log(Module,  String, Args, info).
 warning(Module, String, Args) -> log(Module,  String, Args, warning).
-warning(        String, Args) -> log(?MODULE, String, Args, warning).
-warning(        String      ) -> log(?MODULE, String, [],   warning).
+error  (Module, String, Args) -> log(Module,  String, Args, error).
 
-error(Module, String, Args) -> log(Module,  String, Args, error).
-error(        String, Args) -> log(?MODULE, String, Args, error).
-error(        String)       -> log(?MODULE, String, [],   error).
+%%
+
+to_binary(A) when is_atom(A) -> atom_to_binary(A,latin1);
+to_binary(B) when is_binary(B) -> B;
+to_binary(T) when is_tuple(T) -> term_to_binary(T);
+to_binary(I) when is_integer(I) -> to_binary(integer_to_list(I));
+to_binary(F) when is_float(F) -> float_to_binary(F,[{decimals,9},compact]);
+to_binary(L) when is_list(L) ->  iolist_to_binary(L).
+
