@@ -95,12 +95,14 @@ on_message_publish(Message = #mqtt_message{topic = <<"actions/", _/binary>>, fro
 on_message_publish(#mqtt_message{topic = <<"events/", _TopicTail/binary>> = Topic, qos=Qos,
     from={ClientId,_},payload = Payload}=Message, _Env) ->
     case emqttd_topic:words(Topic) of
-        [E,V,'',M,U,_C,T] ->
-            {Mod,F} = application:get_env(?MODULE, vnode, {?MODULE, get_vnode}),
+        [E,V,'',M,U,_C,T] -> {Mod,F} = application:get_env(?MODULE, vnode, {?MODULE, get_vnode}),
             NewTopic = emqttd_topic:join([E,V,Mod:F(ClientId,Payload),M,U,ClientId,T]),
-            emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)),
-            skip;
-        [_,_,_,_,_,_,_] -> {ok, Message};
+            emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)), skip;
+            %% @NOTE redirect to vnode
+        [E,V,N,M,U,ClientId,T] -> {ok, Message};
+        [E,V,N,M,U,_C,T] -> NewTopic = emqttd_topic:join([E,V,N,M,U,ClientId,T]),
+            emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)), skip;
+            %% @NOTE redirects to event topic with correct ClientId
         _ -> {ok, Message} end;
 
 on_message_publish(Message, _) ->
