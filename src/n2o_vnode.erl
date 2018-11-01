@@ -32,7 +32,7 @@ gen_name(Pos) -> n2o:to_binary([lists:flatten([io_lib:format("~2.16.0b",[X])
 proc(init,#handler{name=Name}=Async) ->
     io:format("VNode Init: ~p\r~n",[Name]),
     {ok, C} = emqttc:start_link([{host, roster:node_ip()},
-                                 {client_id, Name},
+                                 {client_id, list_to_binary(Name)},
                                  {clean_sess, false},
                                  {logger, {console, error}},
                                  {reconnect, 5}]),
