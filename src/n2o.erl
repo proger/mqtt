@@ -308,6 +308,8 @@ get_vnode(ClientId, _) ->
     [H|_] = binary_to_list(erlang:md5(ClientId)),
     integer_to_binary(H rem ring_max() + 1).
 
+validate(_Payload) -> ok.
+
 % Tiny Logging Framework
 
 logger()       -> application:get_env(?MODULE,logger,n2o_io).
