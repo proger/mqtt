@@ -32,7 +32,7 @@ gen_name(Pos) -> n2o:to_binary([lists:flatten([io_lib:format("~2.16.0b",[X])
 proc(init,#handler{name=Name}=Async) ->
     io:format("VNode Init: ~p\r~n",[Name]),
     {ok, C} = emqttc:start_link([{host, roster:node_ip()},
-                                 {client_id, list_to_binary(Name)},
+                                 {client_id, n2o:to_binary(Name)},
                                  {clean_sess, false},
                                  {logger, {console, error}},
                                  {reconnect, 5}]),
@@ -66,7 +66,7 @@ proc({publish, To, Request},
     {reply, Return, State#handler{seq=S+1}};
 
 proc({mqttc, C, connected}, State=#handler{name=Name,state=C,seq=S}) ->
-    case ets:lookup(mqtt_subscription, list_to_binary(Name)) of
+    case ets:lookup(mqtt_subscription, n2o:to_binary(Name)) of
               [_|_]=L -> [ emqttd_router:add_route(#mqtt_route{topic = Topic, node = node()}) ||
                                 #mqtt_subscription{value=Topic} <- L];
                 _    -> emqttc:subscribe(C, n2o:to_binary([<<"events/+/">>, lists:concat([Name]),"/#"]), 2)
