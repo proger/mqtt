@@ -100,7 +100,7 @@ on_message_publish(#mqtt_message{topic = <<"events/", _TopicTail/binary>> = Topi
             NewTopic = emqttd_topic:join([E,V,Mod:F(ClientId,Payload),M,U,ClientId,T]),
             emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)), skip;
         %% @NOTE redirect to vnode
-        [E,V,N,M,U,ClientId,T] ->
+        [_E,_V,_N,_M,_U,ClientId,_T] ->
             case Module:ValidateFun(Payload) of ok -> {ok, Message}; _ -> skip end;
         [E,V,N,M,U,_C,T] -> NewTopic = emqttd_topic:join([E,V,N,M,U,ClientId,T]),
             emqttd:publish(emqttd_message:make(ClientId, Qos, NewTopic, Payload)), skip;
