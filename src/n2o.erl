@@ -304,6 +304,7 @@ log(M,F,A,Fun) ->
          true  -> skip;
          false -> case    log_modules() of
              any       -> (logger()):Fun(M,F,A);
+             []        -> skip;
              Allowed   -> case lists:member(M, Allowed) of
                  true  -> (logger()):Fun(M,F,A);
                  false -> skip end end end.
