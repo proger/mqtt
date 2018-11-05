@@ -1,5 +1,5 @@
 -module(n2o_io).
--author('Roman Gladkov').
+-description('N2O LOG Console').
 -export([info/3, warning/3, error/3]).
 
 info(Module, String, Args) ->

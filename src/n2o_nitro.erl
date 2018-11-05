@@ -1,5 +1,5 @@
 -module(n2o_nitro).
--description('N2O Nitro Protocol: PICKLE, FLUSH, DIRECT, IO, INIT').
+-description('N2O Nitro Protocol').
 -license('ISC').
 -author('Maxim Sokhatsky').
 -include("n2o.hrl").

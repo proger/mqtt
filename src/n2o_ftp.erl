@@ -1,5 +1,5 @@
 -module(n2o_ftp).
--description('N2O File Protocol: FTP').
+-description('N2O File Protocol').
 -license('ISC').
 -author('Andrii Zadorozhnii').
 -include("n2o.hrl").

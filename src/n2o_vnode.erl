@@ -1,5 +1,5 @@
 -module(n2o_vnode).
--description('N2O Virtual Node Server').
+-description('N2O Virtual Node').
 -include("n2o.hrl").
 -compile(export_all).
 

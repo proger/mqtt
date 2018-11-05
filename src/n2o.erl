@@ -1,5 +1,5 @@
 -module(n2o).
--description('N2O Protocol Server for MQTT').
+-description('N2O Protocols for MQTT').
 -author('Maxim Sokhatsky').
 -license('ISC').
 -behaviour(supervisor).
