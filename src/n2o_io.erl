@@ -12,4 +12,4 @@ error(Module, String, Args) ->
     io:format(format_message(Module, String), Args).
 
 format_message(Module, String) ->
-    lists:concat([Module, ":", String, "\n\r"]).
+    lists:concat([Module, ":", String, "\n"]).
