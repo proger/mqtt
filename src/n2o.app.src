@@ -1,5 +1,5 @@
 {application,n2o,
-             [{description,"MQTT N2O Server for EMQ"},
+             [{description,"N2O Distributed Application Server"},
               {vsn,"5.11"},
               {license,"ISC"},
               {applications,[kernel,stdlib,emqttd]},
