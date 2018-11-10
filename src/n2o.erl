@@ -1,7 +1,6 @@
 -module(n2o).
--description('N2O Protocols for MQTT').
+-description('N2O DAS').
 -author('Maxim Sokhatsky').
--license('ISC').
 -behaviour(supervisor).
 -behaviour(application).
 -include("n2o.hrl").
@@ -57,41 +56,19 @@ bench_otp() -> N = run(), {T,_} = timer:tc(fun() ->
                       term_to_binary(X)}) || X <- lists:seq(1,N) ], ok end),
      {otp,trunc(N*1000000/T),"msgs/s"}.
 
-on_client_connected(_ConnAck, Client=#mqtt_client{client_id= <<"emqttc",_/bytes>>}, _) ->
-   {ok, Client};
-
-on_client_connected(_ConnAck, Client = #mqtt_client{}, _Env) ->
-    {ok, Client}.
-
-on_client_disconnected(_Reason, _Client = #mqtt_client{}, _Env) ->
-    ok.
-
-on_client_subscribe(_ClientId, _Username, TopicTable, _Env) ->
-    {ok, TopicTable}.
-
-on_client_unsubscribe(_ClientId, _Username, TopicTable, _Env) ->
-    {ok, TopicTable}.
-
-on_session_created(_ClientId, _Username, _Env) ->
-    ok.
-
-on_session_subscribed(<<"emqttd",_/binary>> = _ClientId,
-    _Username, {<<"actions/",_Vsn, "/",_/binary>> = Topic, Opts}, _Env) ->
-    {ok, {Topic, Opts}};
-
-
-on_session_subscribed(_ClientId, _Username, {Topic, Opts}, _Env) ->
-    {ok, {Topic, Opts}}.
-
-on_session_unsubscribed(_ClientId, _Username, {_Topic, _Opts}, _Env) ->
-    ok.
-
-on_session_terminated(_ClientId, _Username, _Reason, _Env) ->
-    ok.
-
-on_message_publish(Message = #mqtt_message{topic = <<"actions/", _/binary>>, from=_From}, _Env) ->
-    {ok, Message};
-
+on_client_connected(_ConnAck, Client=#mqtt_client{client_id= <<"emqttc",_/bytes>>}, _) -> {ok, Client};
+on_client_connected(_ConnAck, Client = #mqtt_client{}, _Env) -> {ok, Client}.
+on_client_disconnected(_Reason, _Client = #mqtt_client{}, _Env) -> ok.
+on_client_subscribe(_ClientId, _Username, TopicTable, _Env) -> {ok, TopicTable}.
+on_client_unsubscribe(_ClientId, _Username, TopicTable, _Env) -> {ok, TopicTable}.
+on_session_created(_ClientId, _Username, _Env) -> ok.
+on_session_subscribed(<<"emqttd",_/binary>>,_,{<<"actions/",_, "/",_/binary>> =Topic,Opts},_) -> {ok,{Topic,Opts}};
+on_session_subscribed(_ClientId, _Username, {Topic, Opts}, _Env) -> {ok, {Topic,Opts}}.
+on_session_unsubscribed(_ClientId, _Username, {_Topic, _Opts}, _Env) -> ok.
+on_session_terminated(_ClientId, _Username, _Reason, _Env) -> ok.
+on_message_delivered(_ClientId, _Username, Message, _Env) -> {ok,Message}.
+on_message_acked(_ClientId, _Username, Message, _Env) -> {ok,Message}.
+on_message_publish(Message = #mqtt_message{topic = <<"actions/", _/binary>>, from=_From}, _Env) -> {ok, Message};
 on_message_publish(#mqtt_message{topic = <<"events/", _TopicTail/binary>> = Topic, qos=Qos,
     from={ClientId,_},payload = Payload}=Message, _Env) ->
     {Module, ValidateFun} = application:get_env(?MODULE, validate, {?MODULE, validate}),
@@ -111,15 +88,7 @@ on_message_publish(#mqtt_message{topic = <<"events/", _TopicTail/binary>> = Topi
        {ok, _} -> case Module:ValidateFun(Payload) of ok -> Res; _ -> skip end;
         _ -> Res
     end;
-
-on_message_publish(Message, _) ->
-    {ok,Message}.
-
-on_message_delivered(_ClientId, _Username, Message, _Env) ->
-    {ok,Message}.
-
-on_message_acked(_ClientId, _Username, Message, _Env) ->
-    {ok,Message}.
+on_message_publish(Message, _) -> {ok,Message}.
 
 unload() ->
     emqttd:unhook('client.connected',     fun ?MODULE:on_client_connected/3),
@@ -174,18 +143,14 @@ proc({timer,ping},#handler{state=Timer}=Async) ->
     n2o:invalidate_cache(caching),
     {reply,ok,Async#handler{state=timer_restart(ping())}}.
 
+invalidate_cache(Table) -> ets:foldl(fun(X,_) -> n2o:cache(Table,element(1,X)) end, 0, Table).
 timer_restart(Diff) -> {X,Y,Z} = Diff, erlang:send_after(1000*(Z+60*Y+60*60*X),self(),{timer,ping}).
 ping() -> application:get_env(n2o,timer,{0,1,0}).
-
-invalidate_cache(Table) -> ets:foldl(fun(X,_) -> n2o:cache(Table,element(1,X)) end, 0, Table).
-
 ttl() -> application:get_env(n2o,ttl,60*1).
-till(Now,TTL) ->
-    calendar:gregorian_seconds_to_datetime(
-        calendar:datetime_to_gregorian_seconds(Now) + TTL), infinity.
+till(Now,TTL) -> calendar:gregorian_seconds_to_datetime(calendar:datetime_to_gregorian_seconds(Now) + TTL), infinity.
 
-opt()      -> [ set, named_table, { keypos, 1 }, public ].
-tables()   -> application:get_env(n2o,tables,[ cookies, file, caching, ring, async ]).
+opt() -> [ set, named_table, { keypos, 1 }, public ].
+tables() -> application:get_env(n2o,tables,[ cookies, file, caching, ring, async ]).
 storage_init()   -> [ ets:new(X,opt()) || X <- tables() ].
 cache(Tab, Key, undefined)   -> ets:delete(Tab,Key);
 cache(Tab, Key, Value)       -> ets:insert(Tab,{Key,till(calendar:local_time(), ttl()),Value}), Value.
