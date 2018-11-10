@@ -3,17 +3,22 @@ N2O: Protocol Server 5.11 for MQTT
 
 [![Build Status](https://travis-ci.org/synrc/mqtt.svg?branch=master)](https://travis-ci.org/synrc/mqtt)
 
+N2O is a embeddable message protocol loop library for
+WebSocket, HTTP, MQTT and TCP servers. It provides basic
+features, such as: process management; virtual nodes ring for
+request processing; session, encoding, mq, cache and log services.
+It also includes poor man's bridges to server's endpoints.
+
 Features
 --------
 
-* Purpose: High Performance Relay for Protocol Federation
+* Purpose: High performance protocol relay for packet processing
 * Endpoints: WebSockets, MQTT, MQTT-SN, TCP, UDP, CoAP via EMQ
 * Codebase: 500 LOC
 * Buildtools: REBAR, MAD
 * Templates: DTL, NITRO
 * Hosts: Cowboy, EMQ, Mochiweb
-* Error Logging: LAGER
-* Samples: N2O Review Application for MQTT (1)
+* Samples: REVIEW (1), SAMPLE (2)
 
 Special version of N2O
 ----------------------
