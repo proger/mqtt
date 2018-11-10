@@ -1,4 +1,5 @@
 -module(n2o_json).
+-descrpition('N2O JSONE Formatter').
 -export([encode/1,decode/1]).
 
 encode({Io,Eval,Data}) ->

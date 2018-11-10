@@ -1,6 +1,5 @@
 -module(n2o_ring).
--description('N2O Ring: Node Ring Manager').
--copyright('Synrc Research Center').
+-description('N2O Ring').
 -include("n2o.hrl").
 -compile(export_all).
 -record(state, { ring, nodes }).

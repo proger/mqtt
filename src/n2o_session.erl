@@ -1,5 +1,5 @@
 -module(n2o_session).
--description('N2O Session: Device Token Generation').
+-description('N2O Sessions: ETS Token Store').
 -compile(export_all).
 
 authenticate(ClientSessionId, ClientSessionToken) ->

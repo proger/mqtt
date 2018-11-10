@@ -1,5 +1,5 @@
 -module(n2o_proto).
--description('N2O Federation: NITRO, FTP').
+-description('N2O Proto Loop').
 -license('ISC').
 -author('Maxim Sokhatsky').
 -include("n2o.hrl").

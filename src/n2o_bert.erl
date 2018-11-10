@@ -1,4 +1,5 @@
 -module(n2o_bert).
+-description('N2O BERT Formatter').
 -include("n2o.hrl").
 -export([encode/1,decode/1]).
 

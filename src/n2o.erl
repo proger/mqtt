@@ -1,7 +1,6 @@
 -module(n2o).
 -description('N2O DAS').
 -author('Maxim Sokhatsky').
--license('ISC').
 -behaviour(supervisor).
 -behaviour(application).
 -include("n2o.hrl").
