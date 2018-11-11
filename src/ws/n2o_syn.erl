@@ -1,5 +1,5 @@
 -module(n2o_syn).
--description('N2O SYN MQ').
+-description('N2O SYN MQ Backend').
 -include("n2o.hrl").
 -export(?MESSAGE_API).
 

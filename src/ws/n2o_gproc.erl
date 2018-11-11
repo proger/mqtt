@@ -1,5 +1,5 @@
 -module(n2o_gproc).
--description('N2O GPROC MQ').
+-description('N2O GPROC MQ Backend').
 -include("n2o.hrl").
 -export(?MESSAGE_API).
 

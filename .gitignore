@@ -1,2 +1,5 @@
 ebin
 .DS_Store
+.applist
+Mnesia.nonode@nohost
+log

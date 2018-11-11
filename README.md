@@ -14,7 +14,7 @@ Features
 
 * Purpose: High performance protocol relay for packet processing
 * Endpoints: WebSockets, MQTT, MQTT-SN, TCP, UDP, CoAP via EMQ
-* Codebase: 500 LOC
+* Codebase: 1K LOC
 * Buildtools: REBAR, MAD
 * Templates: DTL, NITRO
 * Hosts: Cowboy, EMQ, Mochiweb
