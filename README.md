@@ -1,4 +1,4 @@
-N2O: Protocol Server 5.11 for MQTT
+N2O: Distributed Application Server
 ===================================
 
 [![Build Status](https://travis-ci.org/synrc/mqtt.svg?branch=master)](https://travis-ci.org/synrc/mqtt)

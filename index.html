@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="" />
     <meta name="author" content="Maxim Sokhatsky" />
-    <title>N2O</title>
+    <title>N2O TT</title>
     <link rel="stylesheet" href="https://synrc.space/synrc.css" />
 </head>
 
@@ -26,11 +26,10 @@
     <article>
         <section>
             <h3>SYNOPSIS</h3>
-            <div>N2O is a embeddable message protocol loop library for
-                 WebSocket, HTTP, MQTT and TCP servers. It provides basic
+            <div>N2O TT is a embeddable message protocol loop library for
+                 WebSocket, MQTT and TCP servers. It provides basic
                  features, such as: process management; virtual nodes ring for
                  request processing; session, encoding, mq, cache and log services.
-                 It also includes poor man's bridges to server's endpoints.
             </div>
         </section>
 
@@ -55,43 +54,42 @@
     <section>
 
         <h3>MQTT</h3>
-        <p>
-            <a href="http://emqtt.io">EMQ</a> is an open-source MQTT broker implementation by Feng Lee.
-            It's clean, concise and robust. We've developed an EMQ compatible
-            plugin that works as plugin and have different connection schema
-            than Cowboy's ranch integration of N2O.
+        <p> <a href="http://emqtt.io">EMQ</a> is an open-source MQTT broker implementated by Feng Lee.
+            N2O TT is EMQ compatible plugin that acts as predefined MQTT clients that forms a ring of
+            virtual node and process all the protocol requests then answer to client topics
+            according to classical RPC over MQ schema.
+        </p>
+        <p> This list of modules forms a core of N2O that is common for both N2O TT (emqttd) version
+            and N2O WS (cowboy) version:
         </p>
         <div>
         <ul>
-            <li><b><a href="man/n2o.htm">n2o</a></b> &mdash; N2O Protocol Server <div class=desk>: MQTT version &mdash; 10KB</div></li>
-            <li><b><a href="man/n2o_async.htm">n2o_async</a></b> &mdash; N2O Async Streams<div class=desk>: gen_server &mdash; 4KB</div></li>
-            <li><b><a href="man/n2o_ftp.htm">n2o_ftp</a></b> &mdash; N2O File Protocol<div class=desk>: FTP &mdash; 4KB</div></li>
-            <li><b><a href="man/n2o_nitro.htm">n2o_nitro</a></b> &mdash; N2O Nitro Protocol<div class=desk>:  &mdash; 3KB</div></li>
-            <li><b><a href="man/n2o_proto.htm">n2o_proto</a></b> &mdash; N2O Protocols Loop<div class=desk>: NITRO, FTP &mdash; 1KB</div></li>
-            <li><b><a href="man/n2o_vnode.htm">n2o_vnode</a></b> &mdash; N2O Virtual Node<div class=desk>: MQTT client &mdash; 1KB</div></li>
+            <li><b><a href="man/n2o.htm">n2o</a></b> &mdash; N2O Application<div class=desk>: MQTT version &mdash; 10KB</div></li>
+            <li><b><a href="man/n2o_async.htm">n2o_async</a></b> &mdash; N2O Processes<div class=desk>: gen_server &mdash; 4KB</div></li>
+            <li><b><a href="man/n2o_proto.htm">n2o_proto</a></b> &mdash; N2O Loop<div class=desk>: NITRO, FTP &mdash; 1KB</div></li>
             <li><b><a href="man/n2o_secret.htm">n2o_secret</a></b> &mdash; N2O Security<div class=desk>: HMAC AES/CBC-128 &mdash; 1KB</div></li>
         </ul>
         </div>
-        <p>N2O TT provides real smooth experience for developers:
-           clean git history, small codebase, nitro compatible,
-           man/html docs.</p>
         <figure>
         <code>
  $ git clone git://github.com/synrc/mqtt
- $ open ./man/n2o.htm
+ $ open https://mqtt.n2o.space
         </code></figure>
+        <div>
+        <p>The only MQTT specific module is <b>n2o_vnode</b> which is ring process module.
+        </p>
+        <ul>
+            <li><b><a href="man/n2o_vnode.htm">n2o_vnode</a></b> &mdash; N2O Virtual Node<div class=desk>: MQTT client &mdash; 1KB</div></li>
+        </ul>
+        </div>
     </section>
 
 
     <section>
         <a name=""><h3>WebSocket</h3></a>
-        <p>
-            N2O_start and n2o.js are no longer used in MQTT version of N2O.
-            Instead of N2O_start, MQTT_start and mqtt.js should be used for
-            session control replacement. We traded HEART protocol and session
-            facilities for built-in MQTT features. N2O authentication and
-            authorization mechanisms are also abandoned as MQTT could provide
-            AUTH features too.
+        <p> <a href="">COWBOY</a> is small, fast, and modern HTTP server implementated by Loïc Hoguin.
+            In this version, N2O WS is implemented as WebSocket <b>cowboy</b> handler and routes
+            all messages to message specific protocol handlers.
         </p>
         <ul>
             <li><b><a href="man/n2o_stream.htm">n2o_stream</a></b> &mdash; COWBOY and XHR bridge</li>
@@ -101,19 +99,14 @@
         </ul>
         <figure>
         <code>
- $ git clone git://github.com/synrc/n2o
- $ open https://book.n2o.space
+ $ mad app sample && cd sample
+ $ mad dep com pla rep
+ $ open http://127.0.0.1:8001
         </code></figure>
     </section>
 
     <section>
         <a name=endpoints><h3>Endpoints</h3></a>
-        <p>
-            All N2O/MQTT messages which go directly to TCP and/or WebSocket.
-            However there are some endpoints which are not TCP sockets, even non-sockets,
-            like gen_server endpoint, HTTP REST endpoint, which is non-WebSocket endpoint,
-            and there is a room for other endpoint types.
-        </p>
         <p>
             Here is a list of types of endpoints which are supported by EMQ and accesible to N2O apps:
             WebSockets, MQTT, MQTT-SN, TCP, UDP, CoAP.
@@ -122,6 +115,14 @@
             providing application level message delivery consistency.
             By using MQTT as a transport we extend the supported set of endpoint protocols.
         </p>
+    </section>
+
+    <section>
+        <a name=endpoints><h3>N2O Protocols</h3></a>
+        <ul>
+            <li><b><a href="man/n2o_ftp.htm">n2o_ftp</a></b> &mdash; N2O File Protocol<div class=desk>: FTP &mdash; 4KB</div></li>
+            <li><b><a href="man/n2o_nitro.htm">n2o_nitro</a></b> &mdash; N2O Nitro Protocol<div class=desk>:  &mdash; 3KB</div></li>
+        </ul>
     </section>
 
     <section>
