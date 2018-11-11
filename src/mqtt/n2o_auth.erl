@@ -44,7 +44,7 @@ gen_sid(Time) ->
     nitro_conv:hex(binary:part(crypto:hmac(application:get_env(n2o,hmac,sha256),
         n2o_secret:secret(),term_to_binary(Time)),0,16)).
 
-now_msec() -> now_msec(erlang:timestamp()).
+now_msec() -> now_msec(os:timestamp()).
 now_msec({Mega,Sec,Micro}) -> (Mega*1000000 + Sec)*1000 + round(Micro/1000).
 msec_now(A) -> A0 = A/1000, S = trunc(A0), Mega = S div 1000000,
                 Sec = S - Mega*1000000, Micro = round((A0 - S)*1000000), {Mega,Sec,Micro}.
