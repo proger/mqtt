@@ -1,8 +1,6 @@
 -module(n2o_cowboy).
 -description('N2O Cowboy HTTP Backend').
--author('Roman Shestakov').
 -behaviour(cowboy_http_handler).
--include_lib("n2o/include/wf.hrl").
 -export([init/3, handle/2, terminate/3]).
 -compile(export_all).
 -record(state, {headers, body}).
