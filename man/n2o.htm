@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="" />
     <meta name="author" content="Maxim Sokhatsky" />
-    <title>n2o</title>
+    <title>N2O</title>
     <link rel="stylesheet" href="https://synrc.space/synrc.css" />
 </head>
 
@@ -29,7 +29,7 @@
 <h3>INTRO</h3>
 
 
-<p>The <b>n2o</b> defines the way you create, configure and run
+<p>The <b>N2O</b> defines the way you create, configure and run
 arbitrary applications and protocols inside some hosts, into
 which N2O can be injected, such as <b>cowboy</b> and <a href="http://github.com/synrc/emqttd">emqttd</a>.
 Each application can spawn its instance in its own way, like
@@ -208,7 +208,7 @@ Default n2o cache implementation just turns each ets store into expirable.</p>
     </section>
     <section>
 
-<h3>PUBSUB</h3>
+<h3>BUS</h3>
 
 <p>The minimal requirement for any framework is to pub/sub API.
    N2O provides selectable API through <b>mq</b> environment parameter.</p>
@@ -233,30 +233,21 @@ inflight srotarge once they become online.</p>
     </section>
     <section>
 
-<h3>FORMAT</h3>
+<h3>FORMATTER</h3>
 
 <p>You specify formatter in the <b>#reply/3</b> return from procotol.
    N2O is shipped with two formatters: <b>{bert,_}</b> and <b>{json,_}</b>.
    You can use <b>{binary,_}</b> for unformatted messages. For unhandled messages
    protocol should return in #reply.data <b>{unknown,_}</b>.
 
-<h4>format(Message) -> binary().</h4>
+<h4>encode(record()) -> binary().</h4>
+<h4>decode(binary()) -> record().</h4>
 
 <p>Here is example of formatter and its usage in <b>info/3</b> protocol implementation.</P>
 
 <figure><code>
- -module(ldap).
- -inlcude("LDAP.hrl").
- -export([format/1]).
-
- format(Term) -> element(2,'LDAP':encode(element(1,Term),Term)).
-
- info(#'LDAPMessage', R, S) -> {reply, {ldap, M}, R, S}.
- info(M, R, S)              -> {unknown, M, R, S}.
-
- > ldap:format(#'LDAPMessage'{messageID=2,protocolOp={unbindRequest,3}})).
- <<48,5,2,1,2,66,0>>
-
+ encode(Erl) -> term_to_binary(Erl).
+ decode(Bin) -> binary_to_term(Bin,[safe]).
 </code></figure>
 
     </section>
@@ -327,7 +318,7 @@ before entering the top level N2O loop.</p>
 <p>Gets a Value by any Key.</p>
 
     </section>
-    <section>
+    <!--section>
 
 <h3>PICKLE</h3>
 
@@ -337,7 +328,7 @@ before entering the top level N2O loop.</p>
 
 <h4>depickle(binary()) -> term().</h4>
 
-    </section>
+    </section-->
     <section>
 
 <p>This module may refer to:
