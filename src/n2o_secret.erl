@@ -1,5 +1,5 @@
 -module(n2o_secret).
--description('N2O Security: HMAC AES/CBC-128').
+-description('N2O HMAC AES/CBC-128').
 -include("n2o.hrl").
 -export([pickle/1,depickle/1]).
 

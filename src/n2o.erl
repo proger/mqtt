@@ -255,28 +255,9 @@ validate(_Payload) -> ok.
 
 % Tiny Logging Framework
 
-logger()       -> application:get_env(?MODULE,logger,n2o_io).
-log_modules()  -> application:get_env(?MODULE,log_modules,[]).
-log_level()    -> application:get_env(?MODULE,log_level,info).
-
-level(none)    -> 3;
-level(error)   -> 2;
-level(warning) -> 1;
-level(_)       -> 0.
-
-log(M,F,A,Fun) ->
-    case level(Fun) < level(log_level()) of
-         true  -> skip;
-         false -> case    log_modules() of
-             any       -> (logger()):Fun(M,F,A);
-             []        -> skip;
-             Allowed   -> case lists:member(M, Allowed) of
-                 true  -> (logger()):Fun(M,F,A);
-                 false -> skip end end end.
-
-info   (Module, String, Args) -> log(Module,  String, Args, info).
-warning(Module, String, Args) -> log(Module,  String, Args, warning).
-error  (Module, String, Args) -> log(Module,  String, Args, error).
+info   (Module, String, Args) -> n2o_log:log(Module,  String, Args, info).
+warning(Module, String, Args) -> n2o_log:log(Module,  String, Args, warning).
+error  (Module, String, Args) -> n2o_log:log(Module,  String, Args, error).
 
 %%
 
