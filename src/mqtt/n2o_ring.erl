@@ -77,14 +77,14 @@ set_opaque({Name, Opaque}) ->
 init(Peers) ->
     _ = lists:sum([ C||{_,_,C} <- Peers]),
     RawRing = lists:keysort(1,
-        [ begin 
+        [ begin
             {H, {Node, Opaque}} end || {Node, Opaque, Weight} <- Peers,
             N <- lists:seq(1, Weight),
             H <- [index1([atom_to_list(Node), integer_to_list(N)])]
         ]
     ),
     Ring = array:from_list(assemble_ring([], lists:reverse(RawRing), [], length(Peers))),
-    io:format("Created a ring with ~b points in it.\r~n", [array:sparse_size(Ring)]),
+    n2o:info(?MODULE,"Created a ring with ~b points in it.\r~n", [array:sparse_size(Ring)]),
     application:set_env(n2o,ring,Ring),
     application:set_env(n2o,nodes,Peers),
     {ok, #state{ring=Ring,nodes=Peers}}.
