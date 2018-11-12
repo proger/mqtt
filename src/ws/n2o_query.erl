@@ -1,5 +1,5 @@
 -module(n2o_query).
--author('Maxim Sokhatsky').
+-author('N2O URI Params').
 -include("n2o.hrl").
 -export(?QUERING_API).
 

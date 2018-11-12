@@ -1,7 +1,5 @@
 -module(n2o_proto).
 -description('N2O Proto Loop').
--license('ISC').
--author('Maxim Sokhatsky').
 -include("n2o.hrl").
 -compile(export_all).
 -export([info/3, stream/3, push/5]).

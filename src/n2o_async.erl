@@ -1,7 +1,5 @@
 -module(n2o_async).
 -description('N2O Async Processes').
--author('Maxim Sokhatsky').
--license('ISC').
 -include("n2o.hrl").
 -behaviour(gen_server).
 -export([start_link/1]).
