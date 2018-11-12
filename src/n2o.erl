@@ -132,13 +132,13 @@ decode(Term) -> (formatter()):decode(Term).
 % Cache facilities n2o:cache/[1,2,3]
 
 proc(init,#handler{}=Async) ->
-    io:format("Proc Init: ~p\r~n",[init]),
+    n2o:info(?MODULE,"Proc Init: ~p\r~n",[init]),
     Timer = timer_restart(ping()),
     {ok,Async#handler{state=Timer}};
 
 proc({timer,ping},#handler{state=Timer}=Async) ->
     erlang:cancel_timer(Timer),
-    io:format("n2o Timer: ~p\r~n",[ping]),
+    n2o:info(?MODULE,"n2o Timer: ~p\r~n",[ping]),
     n2o:invalidate_cache(caching),
     {reply,ok,Async#handler{state=timer_restart(ping())}}.
 
