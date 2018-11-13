@@ -16,7 +16,7 @@ var ws = { send: function (payload, qos) {
 var subscribeOptions = {
     qos: 2,  // QoS
     invocationContext: { foo: true },  // Passed to success / failure callback
-    onSuccess: function (x) { console.log("MQTT Subscription "+x); },
+    onSuccess: function (x) { console.log("MQTT Subscribe"); },
     onFailure: function (m) { console.log("MQTT Subscription failed: " + m.errorMessage); },
     timeout: 2 };
 

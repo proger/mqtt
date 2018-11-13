@@ -20,7 +20,7 @@ function N2O_start() {
     ws = new bullet(protocol + host + (port==""?"":":"+port) + "/ws" + querystring);
     ws.onmessage = function (evt) { // formatters loop
     for (var i=0;i<protos.length;i++) { p = protos[i]; if (p.on(evt, p.do).status == "ok") return; } };
-    ws.onopen = function() { if (!active) { ws.send('N2O,'+token()); console.log('WebSocket Connect'); active=true; } };
+    ws.onopen = function() { if (!active) { ws.send('N2O,'+token()); console.log('WS Connect'); active=true; } };
     ws.onclose = function() { active = false; console.log('WebSocket Disconnect'); }; next(); }
 
 /// N2O Protocols
