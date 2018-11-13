@@ -21,7 +21,7 @@ function N2O_start() {
     ws.onmessage = function (evt) { // formatters loop
     for (var i=0;i<protos.length;i++) { p = protos[i]; if (p.on(evt, p.do).status == "ok") return; } };
     ws.onopen = function() { if (!active) { ws.send('N2O,'+token()); console.log('WS Connect'); active=true; } };
-    ws.onclose = function() { active = false; console.log('WebSocket Disconnect'); }; next(); }
+    ws.onclose = function() { active = false; console.log('WS Disconnect'); }; next(); }
 
 /// N2O Protocols
 
@@ -30,7 +30,7 @@ var $io = {}; $io.on = function onio(r, cb) {
         if (r.v[2].v != undefined && r.v[2].v[1] != undefined &&
             r.v[2].v.length == 2 && (r.v[2].v[0].v == "Token" || r.v[2].v[0].v == "Auth")) {
             tok = String.fromCharCode.apply(null, new Uint8Array(r.v[2].v[1].v));
-            //console.log("Token: " + tok.substr(0,20));
+            console.log("WS Subscribe");
             localStorage.setItem("token",tok);
         }
         try { eval(utf8_dec(r.v[1].v)); if (typeof cb == 'function') cb(r); return { status: "ok" }; }
