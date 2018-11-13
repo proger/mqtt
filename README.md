@@ -29,10 +29,8 @@ Credits
 -------
 
 * Yuri Maslovsky
-* Liubov Mykhailova
 * Maxim Sokhatsky
 * Igor Kharin
-* Artem Rudnev
 
 History
 -------
