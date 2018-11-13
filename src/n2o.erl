@@ -1,5 +1,5 @@
 -module(n2o).
--description('N2O DAS').
+-description('N2O DAS MQTT TCP WebSocket').
 -behaviour(supervisor).
 -behaviour(application).
 -include("n2o.hrl").
@@ -104,12 +104,13 @@ send_reply(ClientId, Topic, Message) -> send_reply(ClientId, 0, Topic, Message).
 send_reply(ClientId, QoS, Topic, Message) ->
     emqttd:publish(emqttd_message:make(ClientId, QoS, Topic, Message)).
 
-send(X,Y) -> gproc:send({p,l,X},Y).
-reg(Pool) -> reg(Pool,undefined).
-reg(X,Y) ->
-    case cache(caching,{pool,X}) of
-         undefined -> gproc:reg({p,l,X},Y), cache(caching,{pool,X},X);
-                 _ -> skip end.
+% Pickling n2o:send/1
+
+mq()      -> application:get_env(n2o,mq,n2o_gproc).
+send(X,Y) -> (mq()):send(X,Y).
+reg(X)    -> (mq()):reg(X).
+unreg(X)  -> (mq()):unreg(X).
+reg(X,Y)  -> (mq()):reg(X,Y).
 
 % Pickling n2o:pickle/1
 

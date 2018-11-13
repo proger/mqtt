@@ -20,7 +20,7 @@
 % IO protocol
 
 -record(bin,     { data=[] }).
--record(client,  { id=[], topic=[], data=[] }).
+-record(client,  { data=[] }).
 -record(server,  { data=[] }).
 
 % Nitrogen Protocol

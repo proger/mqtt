@@ -1,83 +1,89 @@
 -module(n2o_nitro).
 -description('N2O Nitro Protocol').
--license('ISC').
--author('Maxim Sokhatsky').
 -include("n2o.hrl").
 -compile(export_all).
 
 % Nitrogen pickle handler
 
 info({init, <<>>}, Req, State = #cx{session = Session}) ->
+    n2o:info(?MODULE,"~p~n",[<<"N2O,">>]),
     {'Token', Token} = n2o_auth:gen_token([], Session),
     info({init, Token}, Req, State);
 
 info({init, Token}, Req, State = #cx{module = Module, session = _Session}) ->
-    case try Elements = Module:main(),
-             n2o:render(Elements),
-             {ok,[]}
-       catch X:Y -> Stack = n2o:stack(X,Y),
-             io:format("Event Main: ~p:~p~n~p", Stack),
-             {error,Stack} end of
-        {ok, _} ->
-             _UserCx = try Module:event(init)
-             catch C:E -> Error = n2o:stack(C,E),
-                          io:format("Event Init: ~p:~p~n~p~n",Error),
-                          {stack,Error} end,
-                     {reply, {bert,{io,render_actions(n2o:actions()), {'Token', Token}}},Req,State};
-        {error,E} -> {reply, {bert,{io,<<>>,E}},Req,State} end;
+    Bin = binary:part(Token,0,20),
+    n2o:info(?MODULE,"~p~n",[<<"N2O,",Bin/binary>>]),
+     case try Elements = Module:main(),
+              nitro:render(Elements),
+              {ok,[]}
+        catch Err:Rea ->
+              StackMain = n2o:stack_trace(Err,Rea),
+              n2o:error(?MODULE,"Catch:~p~n",[StackMain]),
+              {error,StackMain} end of
+   {ok, _} -> Actions = try Module:event(init),
+                            render_actions(nitro:actions())
+         catch Err1:Rea1 -> StackInit = n2o:stack_trace(Err1,Rea1),
+                            n2o:error(?MODULE,"Catch:~p~n",[StackInit]),
+                            {stack,StackInit} end,
+              {reply, {bert,{io,Actions,{'Token',Token}}},Req,State};
+ {error,E} -> {reply, {bert,{io,<<>>,E}},Req,State} end;
 
-info({client,_Id,_Topic,_Message}=Client, Req, State) ->
+info(#client{data=Message}, Req, State) ->
+    nitro:actions([]),
+    n2o:info(?MODULE,"Client Message: ~p",[Message]),
     Module = State#cx.module,
-    _Reply = try Module:event(Client)
-          catch E:R -> Error = n2o:stack(E,R),
-                       io:format("Catch: ~p:~p~n~p",Error), Error end,
-    {reply,{bert,{io,render_actions(n2o:actions()),<<>>}},Req,State};
+    Reply = try Module:event(#client{data=Message})
+          catch Err:Rea -> Stack = n2o:stack_trace(Err,Rea),
+                           n2o:error(?MODULE,"Catch:~p~n",[Stack]),
+                           {error,Stack} end,
+    {reply,{bert,{io,render_actions(nitro:actions()),Reply}},Req,State};
 
-info({pickle,_,_,_}=Event, Req, State) ->
-    n2o:actions([]),
+info(#pickle{}=Event, Req, State) ->
+    nitro:actions([]),
     Result = try html_events(Event,State)
-           catch E:R -> Stack = n2o:stack(E,R),
-                        io:format("Catch: ~p:~p~n~p", Stack),
-                        {io,render_actions(n2o:actions()),Stack} end,
+           catch E:R -> Stack = n2o:stack_trace(E,R),
+                        n2o:error(?MODULE,"Catch: ~p:~p~n~p", Stack),
+                        {io,render_actions(nitro:actions()),Stack} end,
     {reply,{bert,Result}, Req,State};
 
-info({flush,Actions}, Req, State) ->
-    n2o:actions([]),
-    Render = n2o:to_binary([render_actions(Actions)]),
-    {reply,n2o:format({io,Render,<<>>}),Req, State};
+info(#flush{data=Actions}, Req, State) ->
+    Render = nitro:to_binary([render_actions(Actions)]),
+    {reply,{bert,{io,Render,<<>>}},Req, State};
 
-info({direct,Message}, Req, State) ->
-    n2o:actions([]),
+info(#direct{data=Message}, Req, State) ->
+    nitro:actions([]),
     Module = State#cx.module,
     _Result = try Res = Module:event(Message), {direct,Res}
-           catch E:R -> Stack = n2o:stack(E, R),
-                        io:format("Catch: ~p:~p~n~p", Stack),
+           catch E:R -> Stack = n2o:stack_trace(E, R),
+                        n2o:error(?MODULE,"Catch: ~p:~p~n~p", Stack),
                         {stack,Stack} end,
-    {reply,n2o:format({io,render_actions(n2o:actions()),<<>>}), Req,State};
+    {reply,{bert,{io,render_actions(nitro:actions()),<<>>}}, Req,State};
 
 info(Message,Req,State) -> {unknown,Message,Req,State}.
 
 % double render: actions could generate actions
 
 render_actions(Actions) ->
-    n2o:actions([]),
-    First  = n2o:render(Actions),
-    Second = n2o:render(n2o:actions()),
-    n2o:actions([]),
-    n2o:to_binary([First,Second]).
+    nitro:actions([]),
+    First  = nitro:render(Actions),
+    Second = nitro:render(nitro:actions()),
+    nitro:actions([]),
+    nitro:to_binary([First,Second]).
 
 % n2o events
 
-html_events({pickle,Source,Pickled,Linked}, State) ->
-    Ev = n2o:depickle(Pickled),
-    case Ev of
-         #ev{} -> render_ev(Ev,Source,Linked,State);
-         CustomEnvelop -> io:format("EV expected: ~p~n",[CustomEnvelop]) end,
-    {io,render_actions(n2o:actions()),<<>>}.
+html_events(#pickle{source=Source,pickled=Pickled,args=Linked}, State) ->
+    Ev  = n2o:depickle(Pickled),
+    Res = case Ev of
+          #ev{} -> render_ev(Ev,Source,Linked,State), <<>>;
+          CustomEnvelop -> n2o:error(?MODULE,"EV expected: ~p~n",[CustomEnvelop]),
+                           {error,"EV expected"} end,
+    {io,render_actions(nitro:actions()),Res}.
 
-render_ev(#ev{name=F,msg=P,trigger=T},_Source,Linked,State) ->
-    #cx{module=M} = erlang:get(context),
+render_ev(#ev{name=F,msg=P,trigger=T},_Source,Linked,State=#cx{module=M}) ->
     case F of
          api_event -> M:F(P,Linked,State);
-         event -> lists:map(fun({K,V})-> erlang:put(K,n2o:to_binary([V])) end,Linked), M:F(P);
-         _UserCustomEvent -> M:F(P,T,State) end.
+             event -> lists:map(fun ({K,V})-> erlang:put(K,nitro:to_binary([V]))
+                                end,Linked),
+                      M:F(P);
+                 _ -> M:F(P,T,State) end.

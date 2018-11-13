@@ -1,5 +1,5 @@
 -module(n2o_session).
--description('N2O Sessions: ETS Token Store').
+-description('N2O In-Memory Sessions').
 -compile(export_all).
 
 authenticate(ClientSessionId, ClientSessionToken) ->

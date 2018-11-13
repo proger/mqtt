@@ -1,7 +1,5 @@
 -module(n2o_ftp).
 -description('N2O File Protocol').
--license('ISC').
--author('Andrii Zadorozhnii').
 -include("n2o.hrl").
 -include_lib("kernel/include/file.hrl").
 -compile(export_all).
@@ -22,11 +20,11 @@ info(#ftp{status = {event, _}}=FTP, Req, State) ->
     n2o:info(?MODULE,"Event Message: ~p~n", [ FTP#ftp{data = <<>>} ]),
     Module = case State#cx.module of [] -> index; M -> M end,
     Reply = try Module:event(FTP) catch E:R ->
-        Error = n2o:stack(E,R),
-        n2o:error(?MODULE,"Catch: ~p:~p~n~p~n",Error),
+        Error = n2o:stack_trace(E,R),
+        n2o:error(?MODULE,"Catch: ~p~n",[Error]),
         Error
     end,
-    {reply, {binary, n2o_bert:encode({io,n2o_nitro:render_actions(n2o:actions()), Reply})}, Req, State};
+    {reply, {bert, {io,n2o_nitro:render_actions(n2o:actions()), Reply}}, Req, State};
 
 info(#ftp{id = Link, status = <<"init">>, block = Block, offset = Offset}=FTP, Req, State) ->
     Root=?ROOT,
@@ -47,7 +45,7 @@ info(#ftp{id = Link, status = <<"init">>, block = Block, offset = Offset}=FTP, R
     n2o_async:stop(file, Link),
     n2o_async:start(#handler{module=?MODULE, class=file, group=n2o, state=FTP2, name=Link}),
 
-    {reply, {binary, n2o_bert:encode(FTP2)}, Req, State};
+    {reply, {bert, FTP2}, Req, State};
 
 info(#ftp{id = Link, status = <<"send">>}=FTP, Req, State) ->
     n2o:info(?MODULE,"Info Send: ~p~n",[ FTP#ftp{data = <<>>} ]),
@@ -58,7 +56,7 @@ info(#ftp{id = Link, status = <<"send">>}=FTP, Req, State) ->
         FTP#ftp{data = <<>>,block = ?STOP}
     end,
     n2o:info(?MODULE,"Send reply ~p~n",[ Reply#ftp{ data = <<>> }]),
-    {reply, {binary, n2o_bert:encode(Reply)}, Req, State};
+    {reply, {bert, Reply}, Req, State};
 
 info(Message, Req, State) -> {unknown, Message, Req, State}.
 

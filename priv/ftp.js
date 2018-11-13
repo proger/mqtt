@@ -10,7 +10,7 @@ var ftp = {
             status: 'init',
             autostart: ftp.autostart || false,
             name: ftp.filename || file.name,
-            sid: ftp.sid || token(),
+            sid: ftp.sid || token(), // co(session),
             meta: ftp.meta || bin(client()),
             offset: ftp.offset || 0,
             block: 1,
@@ -34,7 +34,7 @@ var ftp = {
         ftp.start();
     },
     send: function (item, data) {
-        wsn.send(enc(tuple(atom('ftp'),
+        ws.send(enc(tuple(atom('ftp'),
             bin(item.id),
             bin(item.sid),
             bin(item.name),

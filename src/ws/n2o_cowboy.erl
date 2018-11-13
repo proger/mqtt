@@ -1,4 +1,5 @@
 -module(n2o_cowboy).
+-include("n2o.hrl").
 -description('N2O Cowboy HTTP Backend').
 -behaviour(cowboy_http_handler).
 -export([init/3, handle/2, terminate/3]).
@@ -9,7 +10,7 @@
 
 init(_Transport, Req, _Opts) -> {ok, Req, #state{}}.
 terminate(_Reason, _Req, _State) -> ok.
-handle(Req, State) ->  {ok, NewReq} = n2o_document:run(Req), {ok, NewReq, State}.
+handle(Req, State) -> n2o:info(?MODULE,"DOCUMENT~n",[]), {ok, Req, State}.
 
 % Cowboy Bridge Abstraction
 

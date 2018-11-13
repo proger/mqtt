@@ -1,5 +1,5 @@
 {application,n2o,
-             [{description,"N2O Distributed Application Server"},
+             [{description,"N2O DAS MQTT TCP WebSocket"},
               {vsn,"5.11"},
               {license,"ISC"},
               {applications,[kernel,stdlib,emqttd]},

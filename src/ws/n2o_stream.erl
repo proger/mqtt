@@ -38,7 +38,7 @@ websocket(R,_) -> down(reply([],R,501)).
 
 websocket_info(I,R,S)        -> ws(n2o_proto:info(I,R,S)).
 websocket_handle(D,R,S)      -> ws(n2o_proto:stream(D,R,S)).
-websocket_init(T,R,O)        -> ws(n2o_proto:init(T,R,[{formatter,bert}|O],ws)).
+websocket_init(T,R,O)        -> ws(n2o_proto:init(T,R,[{formatter,n2o_bert}|O],ws)).
 websocket_terminate(_,R,S)   -> n2o_proto:terminate(R,S).
 
 ws({ok,R,S})                 -> {ok,R,S,hibernate};
@@ -48,4 +48,5 @@ ws({reply,{json,Rep},R,S})   -> {reply,{binary,n2o_json:encode(Rep)},R,S,hiberna
 ws({reply,{bert,Rep},R,S})   -> {reply,{binary,n2o_bert:encode(Rep)},R,S,hibernate};
 ws({reply,{text,Rep},R,S})   -> {reply,{text,Rep},R,S,hibernate};
 ws({reply,{default,Rep},R,S})-> {reply,{binary,n2o:encode(Rep)},R,S,hibernate};
-ws({reply,{Encoder,Rep},R,S})-> {reply,{binary,Encoder:encode(Rep)},R,S,hibernate}.
+ws({reply,{Encoder,Rep},R,S})-> {reply,{binary,Encoder:encode(Rep)},R,S,hibernate};
+ws(X) -> io:format("UNKNOWN: ~p~n",[X]).
