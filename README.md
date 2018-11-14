@@ -23,7 +23,7 @@ Features
 Documentation
 -------------
 
-* N2O Book [PDF](http://synrc.space/apps/n2o/doc/book.pdf)
+* N2O Book [PDF](http://synrc.com/apps/n2o/doc/book.pdf)
 
 Credits
 -------
