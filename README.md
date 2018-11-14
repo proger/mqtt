@@ -56,11 +56,14 @@ WebSocket
 ---------
 
 N2O Loop is directly connected and runned inside context of WebSocket handler.
-Usually in Erlang we use `syn` or `gproc` OTP message buses.
+Usually in Erlang we use `syn` or `gproc` OTP message buses. As such buses are
+optional in MQTT setup we include bus drivers in WebSocket package.
 
 * [n2o_stream](https://mqtt.n2o.space/man/n2o_stream.htm) — N2O cowboy WebSocket backend
 * [n2o_static]() — N2O cowboy WebSocket backend — N2O cowboy HTTP static backend
 * [n2o_cowboy]() — N2O cowboy HTTP backend
+* [n2o_gproc]() — GPROC bus backend
+* [n2o_syn]() — SYN bus backend
 
 ```
 $ mad app web sample
@@ -81,14 +84,12 @@ N2O is shipped with 3 protocols, which could be omited or extended.
 Services
 --------
 
-Formatters, Loggers, MQ services, etc.
+Formatters, Loggers, Sessions, etc.
 
 * [n2o_bert]() — BERT encoder/decoder
 * [n2o_json]() — JSON encoder/decoder
 * [n2o_secret]()  — AES/CBC-128 encoder/decoder
 * [n2o_session]() — ETS session backend
-* [n2o_gproc]() — GPROC bus backend
-* [n2o_syn]() — SYN bus backend
 * [n2o_io]() — IO loger backend
 
 Literature
@@ -99,9 +100,18 @@ Literature
 Credits
 -------
 
-* Yuri Maslovsky
-* Maxim Sokhatsky
-* Igor Kharin
+* Maxim Sokhatsky — core, shen, windows
+* Dmitry Bushmelev — endpoints, yaws, cowboy
+* Andrii Zadorozhnii — elements, actions, handlers
+* Vladimir Kirillov — mac, bsd, xen, linux support
+* Andrey Martemyanov — binary protocols
+* Oleksandr Nikitin — security
+* Anton Logvinenko — doc
+* Roman Shestakov — advanced elements, ct
+* Jesse Gumm — nitrogen, help
+* Yuri Maslovsky — mqtt
+* Igor Kharin — k8s, ekka
+* Rusty Klophaus — original author
 
 History
 -------
@@ -113,4 +123,4 @@ History
 * 4.9.3 — Cleaned n2o_async, written manpage
 * 5.10 — Cleanup
 * 5.11 — Formatter API changes
-* 5.11.1 — WebSocket and MQTT versions unified
+* 5.11.1 — Unification of WebSocket and MQTT versions
