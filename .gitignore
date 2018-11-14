@@ -3,3 +3,4 @@ ebin
 .applist
 Mnesia.nonode@nohost
 log
+deps
