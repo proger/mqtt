@@ -12,16 +12,73 @@ It also includes poor man's bridges to server's endpoints.
 Features
 --------
 
-* Purpose: High performance protocol relay for packet processing
-* Endpoints: WebSockets, MQTT, MQTT-SN, TCP, UDP, CoAP via EMQ
+* Purpose: High performance protocol relay
+* Endpoints: WebSockets, MQTT, TCP
 * Codebase: 1K LOC
 * Buildtools: REBAR, MAD
 * Templates: DTL, NITRO
-* Hosts: Cowboy, EMQ, Mochiweb
+* Hosts: COWBOY, EMQ, MOCHIWEB
 * Samples: REVIEW (1), SAMPLE (2)
 
-Documentation
--------------
+The Idea
+--------
+
+N2O was created to bring clarity ans sanity to software development.
+The distribution model is per file basis with ISC license.
+
+Core
+----
+
+The core modules provide OTP start and N2O entry point.
+
+* [n2o](https://mqtt.n2o.space/man/n2o.htm) — N2O OTP Supervisor and Application
+* [n2o_async](https://mqtt.n2o.space/man/n2o_async.htm) — N2O Async Processes
+* [n2o_proto](https://mqtt.n2o.space/man/n2o_proto.htm) — N2O Loop
+
+MQTT
+----
+
+MQTT version is implemented as RPC over MQ pattern.
+N2O service worker started as ring of virtual nodes each runs N2O loop.
+
+* [n2o_vnode]() — N2O Virtual Node
+* [n2o_auth]() — N2O Auth
+* [n2o_ring]() — N2O Ring
+
+WebSocket
+---------
+
+N2O Loop is directly connected and runned inside context of WebSocket handler.
+Usually in Erlang we use `syn` or `gproc` OTP message buses.
+
+* [n2o_stream](https://mqtt.n2o.space/man/n2o_stream.htm) — N2O cowboy WebSocket backend
+* [n2o_static]() — N2O cowboy WebSocket backend — N2O cowboy HTTP static backend
+* [n2o_cowboy]() — N2O cowboy HTTP backend
+
+Protocols
+---------
+
+N2O is shipped with 3 protocols, which could be omited or extended.
+
+* [n2o_nitro](https://mqtt.n2o.space/man/n2o_nitro.htm) — N2O Nitrogen web framework protocol
+* [n2o_ftp](https://mqtt.n2o.space/man/n2o_ftp.htm) — N2O File protocol
+* [n2p_heart](https://mqtt.n2o.space/man/n2o_heart.htm) — N2O Heart protocol
+
+Services
+--------
+
+Formatters, Loggers, MQ services, etc.
+
+* [n2o_bert]() — BERT encoder/decoder
+* [n2o_json]() — JSON encoder/decoder
+* [n2o_secret]()  — AES/CBC-128 encoder/decoder
+* [n2o_session]() — ETS sessiono backend
+* [n2o_gproc]() — GPROC bus backend
+* [n2o_syn]() — SYN bus backend
+* [n2o_io]() — IO loger backend
+
+Literature
+----------
 
 * N2O Book [PDF](http://synrc.com/apps/n2o/doc/book.pdf)
 
