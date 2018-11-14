@@ -72,7 +72,7 @@ Formatters, Loggers, MQ services, etc.
 * [n2o_bert]() — BERT encoder/decoder
 * [n2o_json]() — JSON encoder/decoder
 * [n2o_secret]()  — AES/CBC-128 encoder/decoder
-* [n2o_session]() — ETS sessiono backend
+* [n2o_session]() — ETS session backend
 * [n2o_gproc]() — GPROC bus backend
 * [n2o_syn]() — SYN bus backend
 * [n2o_io]() — IO loger backend
