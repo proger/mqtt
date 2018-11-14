@@ -23,7 +23,7 @@ Features
 The Idea
 --------
 
-N2O was created to bring clarity ans sanity to software development.
+N2O was created to bring clarity and sanity to software development.
 The distribution model is per file basis with ISC license.
 
 Core
