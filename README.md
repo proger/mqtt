@@ -45,6 +45,13 @@ N2O service worker started as ring of virtual nodes each runs N2O loop.
 * [n2o_auth]() — N2O Auth
 * [n2o_ring]() — N2O Ring
 
+```
+$ mad app mqtt review
+$ cd review
+$ mad dep com pla rep
+$ open http://127.0.0.1:8000
+```
+
 WebSocket
 ---------
 
@@ -54,6 +61,13 @@ Usually in Erlang we use `syn` or `gproc` OTP message buses.
 * [n2o_stream](https://mqtt.n2o.space/man/n2o_stream.htm) — N2O cowboy WebSocket backend
 * [n2o_static]() — N2O cowboy WebSocket backend — N2O cowboy HTTP static backend
 * [n2o_cowboy]() — N2O cowboy HTTP backend
+
+```
+$ mad app web sample
+$ cd sample
+$ mad dep com pla rep
+$ open http://127.0.0.1:8001
+```
 
 Protocols
 ---------
