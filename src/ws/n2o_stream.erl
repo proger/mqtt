@@ -38,7 +38,7 @@ websocket(R,_) -> down(reply([],R,501)).
 
 websocket_info(I,R,S)        -> ws(n2o_proto:info(I,R,S)).
 websocket_handle(D,R,S)      -> ws(n2o_proto:stream(D,R,S)).
-websocket_init(T,R,O)        -> ws(n2o_proto:init(T,R,[{formatter,n2o_bert}|O],ws)).
+websocket_init(T,R,O)        -> ws(n2o_proto:init(T,R,[],ws)).
 websocket_terminate(_,R,S)   -> n2o_proto:terminate(R,S).
 
 ws({ok,R,S})                 -> {ok,R,S,hibernate};

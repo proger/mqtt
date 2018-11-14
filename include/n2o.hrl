@@ -1,5 +1,4 @@
 -ifndef(N2O_HRL).
-
 -define(N2O_HRL, true).
 
 -record(handler, { name, module, class, group, config, state, seq}).
