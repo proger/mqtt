@@ -1,7 +1,7 @@
 -module(n2o_cowboy2).
 -compile(export_all).
 
-init(Req, Opts) -> {cowboy_websocket, Req, Req}.
+init(Req, Opts) -> {cowboy_websocket, Req, Opts}.
 
 ws({ok,R,S})                 -> {ok,S};
 ws({shutdown,R,S})           -> {shutdown,S};
