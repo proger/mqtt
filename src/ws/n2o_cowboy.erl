@@ -30,3 +30,12 @@ cookie(Name, Value, Path, TTL, Req) ->
     cowboy_req:set_resp_cookie(Name, Value, Options, Req).
 delete_cookie(Cookie,Req) -> cookie(Cookie,<<"">>,<<"/">>,0,Req).
 peer(Req) -> {{Ip,Port},Req} = cowboy_req:peer(Req), {Ip,Port}.
+
+static()   ->   { dir, "priv/static", mime()               }.
+n2o()      ->   { dir, "deps/n2o/priv",           mime()   }.
+mime()     -> [ { mimetypes, cow_mimetypes, all            } ].
+
+points() -> cowboy_router:compile([{'_', [
+            { "/n2o/[...]", n2o_static,  n2o()      },
+            { "/app/[...]", n2o_static,  static()   },
+            { "/ws/[...]",  n2o_stream,  []         } ]}]).

@@ -35,7 +35,7 @@ init(_Transport, Req, _Opts, _) ->
     Zero = cx(Req),
     Ctx  = fold(init,Zero#cx.handlers,Zero),
     put(context,Ctx),
-    {Origin, _} = cowboy_req:header(<<"origin">>, Req, <<"*">>),
+    Origin = case cowboy_req:header(<<"origin">>, Req, <<"*">>) of {O,_} -> O; X -> X end,
     ConfigOrigin = iolist_to_binary(application:get_env(n2o,origin,Origin)),
     Req1 = cowboy_req:set_resp_header(<<"Access-Control-Allow-Origin">>, ConfigOrigin, Ctx#cx.req),
     {ok, Req1, Ctx}.
