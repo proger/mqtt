@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="" />
     <meta name="author" content="Maxim Sokhatsky" />
-    <title>N2O TT</title>
+    <title>N2O</title>
     <link rel="stylesheet" href="https://synrc.space/synrc.css" />
 </head>
 
@@ -19,14 +19,14 @@
 
 <header>
     <a href="https://n2o.space"><img src="https://synrc.space/images/Synrc Neo.svg?v=1"></a>
-    <h1>N2O TT</h1>
+    <h1>N2O</h1>
 </header>
 
 <aside>
     <article>
         <section>
             <h3>SYNOPSIS</h3>
-            <div>N2O TT is a embeddable message protocol loop library for
+            <div>N2O is a embeddable message protocol loop library for
                  WebSocket, MQTT and TCP servers. It provides basic
                  features, such as: process management; virtual nodes ring for
                  request processing; session, encoding, mq, cache and log services.
@@ -35,8 +35,7 @@
 
         <section>
             <a name=plugin><h3>USAGE</h3></a>
-            <div>N2O TT comes with EMQ MQTT broker version 2.1.2.
-                 You can get rebar dependency and comlile it:</div>
+            <div>You can get rebar dependency and comlile it:</div>
         <figure>
         <code>
  $ mad get mqtt && cd mqtt
@@ -55,12 +54,12 @@
 
         <a name=mqtt><h3>MQTT</h3></a>
         <p> <a href="http://emqtt.io">EMQ</a> is an open-source MQTT broker implementated by Feng Lee.
-            N2O TT is EMQ compatible plugin that acts as predefined MQTT clients that forms a ring of
+            N2O is EMQ compatible plugin that acts as predefined MQTT clients that forms a ring of
             virtual node and process all the protocol requests then answer to client topics
             according to classical RPC over MQ schema.
         </p>
-        <p> This list of modules forms a core of N2O that is common for both N2O TT (emqttd) version
-            and N2O WS (cowboy) version:
+        <p> This list of modules forms a core of N2O that is common for
+            both MQTT and WebSocket versions:
         </p>
         <div>
         <ul>
