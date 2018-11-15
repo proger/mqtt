@@ -30,9 +30,9 @@ gen_name(Pos) -> n2o:to_binary([lists:flatten([io_lib:format("~2.16.0b",[X])
 
 proc(init,#handler{name=Name}=Async) ->
     n2o:info(?MODULE,"VNode Init: ~p\r~n",[Name]),
-    case erlang:function_exported(emqttc, start_link, 1) of
-         false -> {ok,Async#handler{state=[],seq=0}};
-         true  -> {ok, C} = emqttc:start_link([{host, "127.0.0.1"},
+    case catch emqttc:module_info() of
+         {'EXIT',_} -> {ok,Async#handler{state=[],seq=0}};
+         _ -> {ok, C} = emqttc:start_link([{host, "127.0.0.1"},
                             {client_id, gen_name(Name)},
                             {clean_sess, false},
                             {logger, {console, error}},
