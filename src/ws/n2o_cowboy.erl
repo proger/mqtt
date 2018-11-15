@@ -32,9 +32,9 @@ delete_cookie(Cookie,Req) -> cookie(Cookie,<<"">>,<<"/">>,0,Req).
 peer(Req) -> {{Ip,Port},Req} = cowboy_req:peer(Req), {Ip,Port}.
 
 fix1({error,bad_name}) -> "priv";
-fix1(X) -> X.
+fix1(X) -> case filelib:is_dir(X) of true -> X; _ -> fix1({error,bad_name}) end.
 fix2({error,bad_name}) -> "deps/n2o/priv";
-fix2(X) -> X.
+fix2(X) -> case filelib:is_dir(X) of true -> X; _ -> fix1({error,bad_name}) end.
 
 static() -> { dir, fix1(code:priv_dir(application:get_env(n2o,app,review)))++"/static", mime() }.
 n2o() -> { dir, fix2(code:priv_dir(n2o)), mime() }.
