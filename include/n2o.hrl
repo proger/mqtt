@@ -18,6 +18,7 @@
 
 % IO protocol
 
+-record(init,    { token=[] }).
 -record(bin,     { data=[] }).
 -record(client,  { data=[] }).
 -record(server,  { data=[] }).

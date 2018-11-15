@@ -5,12 +5,12 @@
 
 % Nitrogen pickle handler
 
-info({init, <<>>}, Req, State = #cx{session = Session}) ->
+info(#init{token= <<>>}, Req, State = #cx{session = Session}) ->
     n2o:info(?MODULE,"~p~n",[<<"N2O,">>]),
     {'Token', Token} = n2o_auth:gen_token([], Session),
     info({init, Token}, Req, State);
 
-info({init, Token}, Req, State = #cx{module = Module, session = _Session}) ->
+info(#init{token=Token}, Req, State = #cx{module = Module, session = _Session}) ->
     Bin = binary:part(Token,0,20),
     n2o:info(?MODULE,"~p~n",[<<"N2O,",Bin/binary>>]),
      case try Elements = Module:main(),
@@ -53,11 +53,11 @@ info(#flush{data=Actions}, Req, State) ->
 info(#direct{data=Message}, Req, State) ->
     nitro:actions([]),
     Module = State#cx.module,
-    _Result = try Res = Module:event(Message), {direct,Res}
+    Result = try Res = Module:event(Message), {direct,Res}
            catch E:R -> Stack = n2o:stack_trace(E, R),
                         n2o:error(?MODULE,"Catch: ~p:~p~n~p", Stack),
                         {stack,Stack} end,
-    {reply,{bert,{io,render_actions(nitro:actions()),<<>>}}, Req,State};
+    {reply,{bert,{io,render_actions(nitro:actions()),Result}}, Req,State};
 
 info(Message,Req,State) -> {unknown,Message,Req,State}.
 

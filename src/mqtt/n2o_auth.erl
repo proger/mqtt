@@ -1,7 +1,7 @@
 -module(n2o_auth).
 -description('N2O MQTT Auth').
 -include("emqttd.hrl").
--behaviour(emqttd_auth_mod).
+%-behaviour(emqttd_auth_mod).
 -compile(export_all).
 -export([init/1, check/3, description/0]).
 

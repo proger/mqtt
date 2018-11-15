@@ -1,7 +1,7 @@
 -module(n2o_stream).
 -description('N2O Cowboy WebSocket Backend').
--behaviour(cowboy_http_handler).
--behaviour(cowboy_websocket_handler).
+%-behaviour(cowboy_http_handler).
+%-behaviour(cowboy_websocket_handler).
 -export([init/3,handle/2,info/3,terminate/3]).
 -export([websocket_init/3,websocket_handle/3,websocket_info/3,websocket_terminate/3]).
 
@@ -38,7 +38,7 @@ websocket(R,_) -> down(reply([],R,501)).
 
 websocket_info(I,R,S)        -> ws(n2o_proto:info(I,R,S)).
 websocket_handle(D,R,S)      -> ws(n2o_proto:stream(D,R,S)).
-websocket_init(T,R,O)        -> ws(n2o_proto:init(T,R,[],ws)).
+websocket_init(T,R,_)        -> ws(n2o_proto:init(T,R,[],ws)).
 websocket_terminate(_,R,S)   -> n2o_proto:terminate(R,S).
 
 ws({ok,R,S})                 -> {ok,R,S,hibernate};
