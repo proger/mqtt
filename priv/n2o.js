@@ -33,9 +33,11 @@ var $io = {}; $io.on = function onio(r, cb) {
             console.log("WS Subscribe");
             localStorage.setItem("token",tok);
         }
-        try { eval(utf8_dec(r.v[1].v)); if (typeof cb == 'function') cb(r); return { status: "ok" }; }
-        catch (e) { console.log(r);
-                    return { status: '' }; }
+        try { eval(utf8_dec(r.v[1].v));
+              if (typeof cb == 'function') cb(r);
+              return { status: "ok" };
+        } catch (e)  { console.log(r);
+                       return { status: '' }; }
     } else return { status: '' };
 }
 
@@ -48,14 +50,16 @@ var $file = {}; $file.on = function onfile(r, cb) {
 // BERT Formatter
 
 var $bert = {}; $bert.protos = [$io, $file]; $bert.on = function onbert(evt, cb) {
-    if (Blob.prototype.isPrototypeOf(evt.data) && (evt.data.length > 0 || evt.data.size > 0)) {
+    if (Blob.prototype.isPrototypeOf(evt.data) &&
+       (evt.data.length > 0 || evt.data.size > 0)) {
         var r = new FileReader();
         r.addEventListener("loadend", function () {
             try {
                 erlang = dec(r.result);
                 if (typeof cb == 'function') cb(erlang);
                 for (var i = 0; i < $bert.protos.length; i++) {
-                    p = $bert.protos[i]; if (p.on(erlang, p.do).status == "ok") return;
+                    p = $bert.protos[i];
+                    if (p.on(erlang, p.do).status == "ok") return;
                 }
             } catch (e) { console.log(e); }
         });
