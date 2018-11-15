@@ -28,7 +28,7 @@ load(Env) ->
 stop(_)    -> unload(), ok.
 start(_,_) -> catch load([]), X = supervisor:start_link({local,n2o},n2o, []),
               n2o_async:start(#handler{module=?MODULE,class=caching,group=n2o,state=[],name="timer"}),
-              [ n2o_async:start(#handler{module=n2o_vnode,class=ring,group=n2o,state=[],name=Pos})
+              [ catch n2o_async:start(#handler{module=n2o_vnode,class=ring,group=n2o,state=[],name=Pos})
                 || {{_,_},Pos} <- lists:zip(ring(),lists:seq(1,length(ring()))) ],
                 X.
 ring()     -> n2o_ring:ring_list().
