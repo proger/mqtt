@@ -19,5 +19,5 @@ websocket_info(D,S)          -> ws(n2o_proto:info(D,[],S)).
 
 points() -> cowboy_router:compile([{'_', [
 	    {"/ws/[...]", n2o_cowboy2, []},
-            {"/n2o/[...]", cowboy_static, {dir, code:priv_dir(n2o), []}},
-	    {"/app/[...]", cowboy_static, {dir, code:priv_dir(application:get_env(n2o,app,review))++"/static", []}} ]}]).
+            {"/n2o/[...]", cowboy_static, {dir, n2o_cowboy:fix2(code:priv_dir(n2o)), []}},
+	    {"/app/[...]", cowboy_static, {dir, n2o_cowboy:fix1(code:priv_dir(application:get_env(n2o,app,review)))++"/static", []}} ]}]).

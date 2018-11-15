@@ -31,9 +31,14 @@ cookie(Name, Value, Path, TTL, Req) ->
 delete_cookie(Cookie,Req) -> cookie(Cookie,<<"">>,<<"/">>,0,Req).
 peer(Req) -> {{Ip,Port},Req} = cowboy_req:peer(Req), {Ip,Port}.
 
-static()   ->   { dir, code:priv_dir(application:get_env(n2o,app,review))++"/static", mime() }.
-n2o()      ->   { dir, code:priv_dir(n2o), mime() }.
-mime()     -> [ { mimetypes, cow_mimetypes, all } ].
+fix1({error,bad_name}) -> "priv";
+fix1(X) -> X.
+fix2({error,bad_name}) -> "deps/n2o/priv";
+fix2(X) -> X.
+
+static() -> { dir, fix1(code:priv_dir(application:get_env(n2o,app,review)))++"/static", mime() }.
+n2o() -> { dir, fix2(code:priv_dir(n2o)), mime() }.
+mime() -> [ { mimetypes, cow_mimetypes, all } ].
 
 points() -> cowboy_router:compile([{'_', [
             { "/n2o/[...]", cowboy_static,  n2o()      },
