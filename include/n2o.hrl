@@ -25,6 +25,7 @@
 
 % Nitrogen Protocol
 
+-record(init,    { token=[] }).
 -record(pickle,  { source=[], pickled=[], args=[] }).
 -record(flush,   { data=[] }).
 -record(direct,  { data=[] }).
