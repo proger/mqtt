@@ -35,20 +35,43 @@
 
     </section>
     <section>
-        <h3>#init{token}</h3>
-
+        <h3>INIT</h3>
+        <div>
+        <figure><code>
+ -record(init, { token :: binary() }).
+        </code></figure>
+        </div>
     </section>
     <section>
-        <h3>#client{data}</h3>
-
+        <h3>PICKLE</h3>
+        <div>
+        <figure><code>
+ -record(pickle, { source  = [] :: [] | binary(),
+                   pickled = [] :: [] | binary(),
+                   args    = [] :: list({atom(),any()}) }).
+        </code></figure>
+        </div>
     </section>
     <section>
-        <h3>#flush{data}</h3>
-
+        <h3>DIRECT</h3>
+        <div>
+        <figure><code>
+ -record(direct, { data = [] :: any() }).
+        </code></figure>
+        </div>
     </section>
     <section>
-        <h3>#flush{data}</h3>
+        <h3>FLUSH</h3>
+        <div>
+        <figure><code>
+ -record(flush, { data = [] :: [] | list(#action{}) }).
 
+ -record(ev,    { module  = [] :: [] | atom(),
+                  msg     = [] :: any(),
+                  trigger = [] :: [] | binary(),
+                  name    = [] :: [] | binary() }).
+        </code></figure>
+        </div>
     </section>
     <section>
 
