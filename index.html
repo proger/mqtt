@@ -87,8 +87,7 @@
  $ open http://127.0.0.1:8000
         </code></figure>
         <div>
-        <p>The only MQTT specific module is <b>n2o_vnode</b> which is ring process module.
-        </p>
+        <p>The list of MQTT specific modules:</p>
         <ul>
             <li><b><a href="man/n2o_auth.htm">n2o_auth</a></b> &mdash; N2O MQTT Authentication<div class=desk>: MQTT auth module &mdash; 1KB</div></li>
             <li><b><a href="man/n2o_vnode.htm">n2o_vnode</a></b> &mdash; N2O Virtual Node<div class=desk>: MQTT client &mdash; 1KB</div></li>
@@ -101,9 +100,10 @@
     <section>
         <a name=ws><h3>WebSocket</h3></a>
         <p> <a href="https://ninenines.eu">COWBOY</a> is small, fast, and modern HTTP server implementated by Loïc Hoguin.
-            In this version, N2O WS is implemented as WebSocket <b>cowboy</b> handler and routes
-            all messages to message specific protocol handlers.
+            In this version, N2O loop is integrated as WebSocket <b>cowboy</b>
+            handler that routes all incoming messages to N2O.
         </p>
+        <p>The list of WebSocket specific modules:</p>
         <ul>
             <li><b><a href="man/n2o_stream.htm">n2o_stream</a></b> &mdash; COWBOY and XHR bridge</li>
             <li><b><a href="man/n2o_heart.htm">n2o_heart</a></b> &mdash; PING protocol</li>
