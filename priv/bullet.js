@@ -1,7 +1,7 @@
 
 // WebSocket Transport
 
-$ws = { heart: true, interval: 30000,
+$ws = { heart: true, interval: 5000,
         creator: function(url) { return window.WebSocket ? new window.WebSocket(url) : false; },
         onheartbeat: function() { this.channel.send('PING');
                                   } };
