@@ -39,6 +39,7 @@ proc(init,#handler{name=Name}=Async) ->
                             {reconnect, 5}]),
                   {ok,Async#handler{state=C,seq=0}} end;
 
+proc({publish,_,_}, State=#handler{state=[]}) -> {reply,[],State};
 proc({publish, To, Request},
     State  = #handler{name=Name,state=C,seq=S}) ->
     Addr   = emqttd_topic:words(To),
