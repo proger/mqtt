@@ -51,12 +51,23 @@
 </aside>
 <main>
     <section>
+        <a name=endpoint><h3>Endpoints</h3></a>
+        <p>
+            Here is a list of types of endpoints which are supported by EMQ and accesible to N2O apps:
+            WebSockets, MQTT, MQTT-SN, TCP, UDP, CoAP.
+            Normal use of N2O as a Web Framework or a Web Application Server is through WebSockets,
+            but for IoT and MQTT applications it could be served through UDP or SCTP protocols
+            providing application level message delivery consistency.
+            By using MQTT as a transport we extend the supported set of endpoint protocols.
+        </p>
+    </section>
+    <section>
 
         <a name=mqtt><h3>MQTT</h3></a>
         <p> <a href="http://emqtt.io">EMQ</a> is an open-source MQTT broker implementated by Feng Lee.
-            N2O is EMQ compatible plugin that acts as predefined MQTT clients that forms a ring of
-            virtual node and process all the protocol requests then answer to client topics
-            according to classical RPC over MQ schema.
+            N2O is EMQ compatible plugin that acts as predefined MQTT clients that form
+            a ring of virtual nodes, process all the protocol requests,
+            and answer to client topics according to classical RPC over MQ schema.
         </p>
         <p> This list of modules forms a core of N2O that is common for
             both MQTT and WebSocket versions:
@@ -76,8 +87,7 @@
  $ open http://127.0.0.1:8000
         </code></figure>
         <div>
-        <p>The only MQTT specific module is <b>n2o_vnode</b> which is ring process module.
-        </p>
+        <p>The list of MQTT specific modules:</p>
         <ul>
             <li><b><a href="man/n2o_auth.htm">n2o_auth</a></b> &mdash; N2O MQTT Authentication<div class=desk>: MQTT auth module &mdash; 1KB</div></li>
             <li><b><a href="man/n2o_vnode.htm">n2o_vnode</a></b> &mdash; N2O Virtual Node<div class=desk>: MQTT client &mdash; 1KB</div></li>
@@ -90,9 +100,10 @@
     <section>
         <a name=ws><h3>WebSocket</h3></a>
         <p> <a href="https://ninenines.eu">COWBOY</a> is small, fast, and modern HTTP server implementated by Loïc Hoguin.
-            In this version, N2O WS is implemented as WebSocket <b>cowboy</b> handler and routes
-            all messages to message specific protocol handlers.
+            In this version, N2O loop is integrated as WebSocket <b>cowboy</b>
+            handler that routes all incoming messages to N2O.
         </p>
+        <p>The list of WebSocket specific modules:</p>
         <ul>
             <li><b><a href="man/n2o_stream.htm">n2o_stream</a></b> &mdash; COWBOY and XHR bridge</li>
             <li><b><a href="man/n2o_heart.htm">n2o_heart</a></b> &mdash; PING protocol</li>
@@ -110,17 +121,6 @@
         </code></figure>
     </section>
 
-    <section>
-        <a name=endpoint><h3>Endpoints</h3></a>
-        <p>
-            Here is a list of types of endpoints which are supported by EMQ and accesible to N2O apps:
-            WebSockets, MQTT, MQTT-SN, TCP, UDP, CoAP.
-            Normal use of N2O as a Web Framework or a Web Application Server is through WebSockets,
-            but for IoT and MQTT applications it could be served through UDP or SCTP protocols
-            providing application level message delivery consistency.
-            By using MQTT as a transport we extend the supported set of endpoint protocols.
-        </p>
-    </section>
 
     <section>
         <a name=protocols><h3>Protocols</h3></a>
