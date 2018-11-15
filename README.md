@@ -20,14 +20,14 @@ Features
 * Hosts: COWBOY, EMQ, MOCHIWEB
 * Samples: REVIEW (1), SAMPLE (2)
 
-The Idea
---------
+Idea
+----
 
 N2O was created to bring clarity and sanity to software development.
 The distribution model is per file basis with ISC license.
 
-Core
-----
+Kernel
+------
 
 The core modules provide OTP start and N2O entry point.
 
@@ -56,8 +56,8 @@ WebSocket
 ---------
 
 N2O Loop is directly connected and runned inside context of WebSocket handler.
-Usually in Erlang we use `syn` or `gproc` OTP message buses. As such buses are
-optional in MQTT setup we include bus drivers in WebSocket package.
+Usually in Erlang we use `syn` or `gproc` OTP message buses.
+As such buses are optional in MQTT setup we include bus drivers in WebSocket package.
 
 * [n2o_stream](https://mqtt.n2o.space/man/n2o_stream.htm) — COWBOY and XHR bridge
 * [n2o_heart](https://mqtt.n2o.space/man/n2o_heart.htm) — PING protocol
@@ -85,7 +85,7 @@ N2O is shipped with 3 protocols, which could be omited or extended.
 Services
 --------
 
-Formatters, Loggers, Sessions, etc.
+Formatters, Loggers, Sessions, etc. Optional.
 
 * [n2o_bert](https://mqtt.n2o.space/man/n2o_bert.htm) — BERT encoder/decoder
 * [n2o_json](https://mqtt.n2o.space/man/n2o_json.htm) — JSON encoder/decoder
