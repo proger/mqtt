@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="" />
     <meta name="author" content="Maxim Sokhatsky" />
-    <title>AUTH</title>
+    <title>RING</title>
     <link rel="stylesheet" href="https://synrc.space/synrc.css" />
 </head>
 
@@ -20,7 +20,7 @@
 
 <header>
     <a href="../index.html"><img src="https://n2o.space/img/Synrc Neo.svg"></a>
-    <h1>AUTH</h1>
+    <h1>RING</h1>
 </header>
 
 <main>
@@ -29,32 +29,7 @@
 
 <h3>INTRO</h3>
 
-<p>The <b>n2o_auth</b> module provides EMQ auth hook that perform
-   client's autisubscribe to client topic.</p>
-
-    </section>
-    <section>
-
-<h3>CALLBACK</h3>
-
-<h4>check(#mqtt_client{},binary(),term()) -> ok | ignore.</h4>
-
-<p>The default implementation performs client topic autosubscribe at server side.</p>
-
-<figure><code>
-  check(#mqtt_client{client_id = ClientId, username  = PageModule,
-    client_pid = ClientPid,
-    ws_initial_headers = _Headers}, Password, Listeners) ->
-    ClientId = ensure_id(Client),
-    case ClientId of
-        <<"emqttd_", _/binary>> ->
-            emqttd_client:subscribe(ClientPid,
-                [{n2o:to_binary(["actions/1/",PageModule,"/",ClientId]), 2}]),
-             ignore;
-        _ -> ignore
-    end.
-
-</code></figure>
+<p>The <b>n2o_ring</b> module provides hash ring for virtual nodes.</p>
 
     </section>
     <section>
