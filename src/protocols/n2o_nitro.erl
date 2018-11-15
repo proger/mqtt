@@ -5,12 +5,16 @@
 
 % Nitrogen pickle handler
 
-info({init, <<>>}, Req, State = #cx{session = Session}) ->
+info({text,<<"N2O,",Process/binary>> = _InitMarker}=Message, Req, State) ->
+    n2o:info(?MODULE,"N2O INIT: ~p",[Message]),
+    info(#init{token=Process},Req,State);
+
+info(#init{token= <<>>}, Req, State = #cx{session = Session}) ->
     n2o:info(?MODULE,"~p~n",[<<"N2O,">>]),
     {'Token', Token} = n2o_auth:gen_token([], Session),
     info({init, Token}, Req, State);
 
-info({init, Token}, Req, State = #cx{module = Module, session = _Session}) ->
+info(#init{token=Token}, Req, State = #cx{module = Module, session = _Session}) ->
     Bin = binary:part(Token,0,20),
     n2o:info(?MODULE,"~p~n",[<<"N2O,",Bin/binary>>]),
      case try Elements = Module:main(),
