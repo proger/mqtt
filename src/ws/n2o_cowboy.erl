@@ -36,6 +36,6 @@ n2o()      ->   { dir, "deps/n2o/priv",           mime()   }.
 mime()     -> [ { mimetypes, cow_mimetypes, all            } ].
 
 points() -> cowboy_router:compile([{'_', [
-            { "/n2o/[...]", n2o_static,  n2o()      },
-            { "/app/[...]", n2o_static,  static()   },
+            { "/n2o/[...]", cowboy_static,  n2o()      },
+            { "/app/[...]", cowboy_static,  static()   },
             { "/ws/[...]",  n2o_stream,  []         } ]}]).
