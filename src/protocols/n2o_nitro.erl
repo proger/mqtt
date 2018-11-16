@@ -6,7 +6,7 @@
 % Nitrogen pickle handler
 
 info({text,<<"N2O,",Process/binary>> = _InitMarker}=Message, Req, State) ->
-    n2o:info(?MODULE,"N2O INIT: ~p",[Message]),
+    n2o:info(?MODULE,"N2O INIT: ~p~n",[Message]),
     info(#init{token=Process},Req,State);
 
 info(#init{token= <<>>}, Req, State = #cx{session = Session}) ->
@@ -16,7 +16,7 @@ info(#init{token= <<>>}, Req, State = #cx{session = Session}) ->
 
 info(#init{token=Token}, Req, State = #cx{module = Module, session = _Session}) ->
     Bin = binary:part(Token,0,20),
-    n2o:info(?MODULE,"~p~n",[<<"N2O,",Bin/binary>>]),
+    n2o:info(?MODULE,"N2O TOKEN: ~p~n",[Module, <<"N2O,",Bin/binary>>]),
      case try Elements = Module:main(),
               nitro:render(Elements),
               {ok,[]}

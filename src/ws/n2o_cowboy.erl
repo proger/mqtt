@@ -43,4 +43,4 @@ mime() -> [ { mimetypes, cow_mimetypes, all } ].
 points() -> cowboy_router:compile([{'_', [
             { "/n2o/[...]", cowboy_static,  n2o()      },
             { "/app/[...]", cowboy_static,  static()   },
-            { "/ws/[...]",  n2o_stream,  []         } ]}]).
+            { "/ws/[...]",  n2o_stream,  []            } ]}]).

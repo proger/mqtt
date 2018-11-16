@@ -21,7 +21,7 @@ push(M,R,S,[H|T],Acc)     ->
                         A -> push(M,R,S,T,[A|Acc]) end.
 
 cx(Req) -> #cx{actions=[], path=[], req=Req, params=[],
-               handlers= [ {routes, application:get_env(n2o,routes, [])} ]}.
+               handlers= [ {routes, application:get_env(n2o,routes,routes)} ]}.
 
 fold(Fun,Handlers,Ctx) ->
     lists:foldl(
