@@ -16,7 +16,7 @@ info(#init{token= <<>>}, Req, State = #cx{session = Session}) ->
 
 info(#init{token=Token}, Req, State = #cx{module = Module, session = _Session}) ->
     Bin = binary:part(Token,0,20),
-    n2o:info(?MODULE,"N2O TOKEN: ~p~n",[Module, <<"N2O,",Bin/binary>>]),
+    n2o:info(?MODULE,"N2O TOKEN: ~p~n",[<<"N2O,",Bin/binary>>]),
      case try Elements = Module:main(),
               nitro:render(Elements),
               {ok,[]}
