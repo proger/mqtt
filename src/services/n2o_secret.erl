@@ -20,4 +20,4 @@ depickle(PickledData) ->
         Signature = crypto:hmac(sha256,Key,<<Cipher/binary,IV/binary>>),
         {Data,_Time} = binary_to_term(crypto:block_decrypt(aes_cbc128,Key,IV,Cipher),[safe]),
         Data
-    catch E:R -> io:format("~nDepicke Error: ~p~n",[{E,R}]), <<>> end.
+    catch _:_ -> <<>> end.
