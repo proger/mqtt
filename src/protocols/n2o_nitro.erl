@@ -11,7 +11,8 @@ info({text,<<"N2O,",Process/binary>> = _InitMarker}=Message, Req, State) ->
 
 info(#init{token= <<>>}, Req, State = #cx{session = Session}) ->
     n2o:info(?MODULE,"~p~n",[<<"N2O,">>]),
-    {'Token', Token} = n2o_auth:gen_token([], Session),
+%   {'Token', Token} = n2o_auth:gen_token([], Session), % MQTT
+    {'Token', Token} = n2o_session:authenticate([], Session), % WS
     info({init, Token}, Req, State);
 
 info(#init{token=Token}, Req, State = #cx{module = Module, session = _Session}) ->

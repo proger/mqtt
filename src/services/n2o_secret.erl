@@ -1,7 +1,7 @@
 -module(n2o_secret).
 -description('N2O HMAC AES/CBC-128').
 -include("n2o.hrl").
--export([pickle/1,depickle/1]).
+-export([pickle/1,depickle/1,secret/0]).
 
 pickle(Data) ->
     Message = term_to_binary({Data,os:timestamp()}),
