@@ -13,7 +13,7 @@ expired(Till) -> Till < to(calendar:local_time()).
 expire()      -> to(till(calendar:local_time(), ttl())).
 auth(Sid,Exp) -> {{Sid,<<"auth">>},{Exp,{[],[]}}}.
 token(Auth)   -> ets:insert(cookies,Auth), {'Token',n2o:pickle(Auth)}.
-ttl()         -> application:get_env(n2o,ttl,60*1).
+ttl()         -> application:get_env(n2o,ttl,60*15).
 till(Now,TTL) -> from(to(Now)+TTL).
 prolongate()  -> application:get_env(n2o,nitro_prolongate,false).
 sid(Seed)     -> nitro_conv:hex(binary:part(crypto:hmac(application:get_env(n2o,hmac,sha256),
