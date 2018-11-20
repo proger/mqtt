@@ -57,26 +57,26 @@ invalidate_sessions() ->
 % TESTS
 
 positive_test() ->
-    application:set_env(n2o,nitro_prolongate,no),
+    application:set_env(n2o,nitro_prolongate,false),
     {'Token',B}=n2o_session:authenticate("",""),
-    {{SID,Key},{Till,[]}} = n2o:depickle(B),
+    {{SID,Key},{Till,{[],[]}}} = n2o:depickle(B),
     {'Token',C}=n2o_session:authenticate("",B),
-    {{SID,Key},{Till,[]}} = n2o:depickle(C),
+    {{SID,Key},{Till,{[],[]}}} = n2o:depickle(C),
     delete_auth({SID,<<"auth">>}),
     true=(C==B).
 
 negative_test() ->
-    application:set_env(n2o,nitro_prolongate,no),
+    application:set_env(n2o,nitro_prolongate,false),
     application:set_env(n2o, ttl, 2),
     {'Token', TokenA} = n2o_session:authenticate("", ""),
-    {{SID0,_},{_,[]}} = n2o:depickle(TokenA),
+    {{SID0,_},{_,{[],[]}}} = n2o:depickle(TokenA),
     timer:sleep(3000),
     {'Token', TokenB} = n2o_session:authenticate("", TokenA),
-    {{SID1,_},{_,[]}} = n2o:depickle(TokenB),
+    {{SID1,_},{_,{[],[]}}} = n2o:depickle(TokenB),
     application:set_env(n2o, ttl, 60*15),
     TokenWasChanged = TokenA /= TokenB,
     {'Token', TokenC} = n2o_session:authenticate("", TokenB),
-    {{SID2,_},{_,[]}} = n2o:depickle(TokenC),
+    {{SID2,_},{_,{[],[]}}} = n2o:depickle(TokenC),
     NewTokenIsValid = TokenB == TokenC,
     delete_auth({SID0,<<"auth">>}),
     delete_auth({SID1,<<"auth">>}),
