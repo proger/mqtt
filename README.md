@@ -93,6 +93,18 @@ Formatters, Loggers, Sessions, etc. Optional.
 * [n2o_session](https://mqtt.n2o.space/man/n2o_session.htm) — ETS session backend
 * [n2o_io](https://mqtt.n2o.space/man/n2o_io.htm) — IO loger backend
 
+JavaScript
+----------
+
+* [bert.js](https://mqtt.n2o.space/man/bert.js.htm) — BERT encoder/decoder
+* [utf8.js](https://mqtt.n2o.space/man/utf8.js.htm) — UTF8 encoder/decoder
+* [ieee754.js](https://mqtt.n2o.space/man/ieee754.js.htm) — IEEE754 encoder/decoder
+* [heart.js](https://mqtt.n2o.space/man/heart.js.htm) — HEART protocol
+* [nitro.js](https://mqtt.n2o.space/man/nitro.js.htm) — NITRO protocol
+* [ftp.js](https://mqtt.n2o.space/man/ftp.js.htm)  — FTP protocol
+* [n2o.js](https://mqtt.n2o.space/man/n2o.js.htm) — N2O protocol looper
+* [mq.js](https://mqtt.n2o.space/man/mq.js.htm) — MQTT client
+
 Literature
 ----------
 

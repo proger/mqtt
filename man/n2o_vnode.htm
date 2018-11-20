@@ -28,7 +28,8 @@
 
 <h3>INTRO</h3>
 
-<p><b>n2o_vnode</b> is an instance of <a href="n2o_async.htm">n2o_async</a> prorocess. In N2O
+<p><b><a href="https://github.com/synrc/mqtt/blob/master/src/mqtt/n2o_vnode.erl">n2o_vnode</a></b>
+  is an instance of <a href="n2o_async.htm">n2o_async</a> prorocess. In N2O
 number of such instanses is usually equals to the number of cores.</p>
 
 <p>There is two styles of embedding N2O: one is to perform N2O protocol loop inside
@@ -41,7 +42,7 @@ number of such instanses is usually equals to the number of cores.</p>
 
 <h3>PROTOCOL</h3>
 
-<p>On <b>#init/0</b> n2o_vnode makes connection to MQTT server.
+<p>On <b>init</b> n2o_vnode makes connection to MQTT server.
 On connection established in <b>#mqttc/2</b> it subscribes to events topic.</p>
 
 <figure>
@@ -57,8 +58,6 @@ embedded as handler to that message.</p>
 
 <figure>
 <code>
-    #init { }
-
  #publish { topic   = [] :: binary(),
             message = [] :: binary()}.
 
