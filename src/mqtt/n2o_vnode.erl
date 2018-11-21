@@ -42,6 +42,7 @@ proc(init,#handler{name=Name}=Async) ->
 proc({publish,_,_}, State=#handler{state=[]}) -> {reply,[],State};
 proc({publish, To, Request},
     State  = #handler{name=Name,state=C,seq=S}) ->
+    io:format("P: ~p~n",[To]),
     Addr   = emqttd_topic:words(To),
     Bert   = n2o:decode(Request),
     Return = case Addr of
