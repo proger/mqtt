@@ -9,9 +9,9 @@ info({text,<<"N2O,",Auth/binary>>}, Req, State) ->
     info(#init{token=Auth},Req,State);
 
 info(#init{token=Auth}, Req, State = #cx{module = Module}) ->
-     n2o:info(?MODULE,"N2O TOKEN: ~p~n",[Auth]),
      {'Token', Token} = n2o_session:authenticate([], Auth),
      Sid = case n2o:depickle(Token) of {{S,_},_} -> S; X -> X end,
+     n2o:info(?MODULE,"N2O SESSION: ~p~n",[Sid]),
      New = State#cx{session = Sid},
      put(context,New),
      case try Elements = Module:main(),
