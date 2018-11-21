@@ -1,6 +1,9 @@
 -ifndef(N2O_HRL).
 -define(N2O_HRL, true).
 
+-type token() :: { 'Token', binary() }.
+-type session() :: { { binary(), term() } , { integer(), term() } }.
+
 -record(handler, { name, module, class, group, config, state, seq}).
 -record(cx,      { handlers=[], actions=[], req=[], module=[], lang=[], path=[],
                    session=[], formatter=bert, params=[], node=[], client_pid=[], state=[], from=[], vsn = [] }).
