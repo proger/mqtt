@@ -24,9 +24,10 @@ sid(Seed)     -> nitro_conv:hex(binary:part(crypto:hmac(application:get_env(n2o,
 authenticate([], Pickle) ->
     case n2o:depickle(Pickle) of
         <<>> -> token(auth(sid(os:timestamp()),expire()));
-        {{Sid,'auth'},{Till,[]}} ->
+        {{Sid,'auth'},{Till,[]}} = Auth ->
             case expired(Till) orelse prolongate() of
-                false -> {'Token', Pickle};
+                false -> ets:insert(cookies,Auth),
+                         {'Token', Pickle};
                  true -> delete_auth({Sid,auth}),
                          token(auth(Sid,expire())) end end.
 
