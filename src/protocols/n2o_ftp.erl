@@ -2,7 +2,7 @@
 -description('N2O File Protocol').
 -include("n2o.hrl").
 -include_lib("kernel/include/file.hrl").
--export([proc/2,filename/1]).
+-export([info/3,proc/2,filename/1]).
 
 -define(ROOT, filename:join(mad_utils:cwd(),application:get_env(n2o,upload,code:priv_dir(n2o)))).
 -define(NEXT, 5*1024). % 256K chunks for best 25MB/s speed
