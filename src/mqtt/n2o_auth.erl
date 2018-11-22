@@ -40,10 +40,7 @@ gen_token(ClientSessionToken, Data) ->
 bin_to_term(<<>>) -> <<>>;
 bin_to_term(Bin) -> binary_to_term(Bin).
 
-gen_sid(Time) ->
-    nitro_conv:hex(binary:part(crypto:hmac(application:get_env(n2o,hmac,sha256),
-        n2o_secret:secret(),term_to_binary(Time)),0,16)).
-
+gen_sid(Time) -> n2o_secret:sid(Time).
 now_msec() -> now_msec(os:timestamp()).
 now_msec({Mega,Sec,Micro}) -> (Mega*1000000 + Sec)*1000 + round(Micro/1000).
 msec_now(A) -> A0 = A/1000, S = trunc(A0), Mega = S div 1000000,

@@ -1,7 +1,7 @@
 -module(n2o_session).
 -include_lib("stdlib/include/ms_transform.hrl").
 -description('N2O Session').
--export([authenticate/2, get_value/3, set_value/3, storage/0, sid/1, prolongate/0, from/1]).
+-export([authenticate/2, get_value/3, set_value/3, storage/0, prolongate/0, from/1]).
 -export([clear/1, delete/1, update/1, lookup/1, invalidate_sessions/0]).
 
 % PRELUDE
@@ -19,8 +19,7 @@ token(A,P)    -> (storage()):update(A), {'Token',P}.
 ttl()         -> application:get_env(n2o,ttl,60*15).
 till(Now,TTL) -> from(to(Now)+TTL).
 prolongate()  -> application:get_env(n2o,nitro_prolongate,false).
-sid(Seed)     -> n2o_secret:hex(binary:part(crypto:hmac(application:get_env(n2o,hmac,sha256),
-                 n2o_secret:secret(),term_to_binary(Seed)),0,10)).
+sid(Seed)     -> n2o_secret:sid(Seed).
 
 % API
 
