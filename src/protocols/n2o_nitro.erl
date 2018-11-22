@@ -1,5 +1,5 @@
 -module(n2o_nitro).
--description('N2O Nitro Protocol').
+-description('N2O Nitrogen Web Framework Protocol').
 -include("n2o.hrl").
 -export([info/3]).
 

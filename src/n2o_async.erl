@@ -1,5 +1,5 @@
 -module(n2o_async).
--description('N2O Processes').
+-description('N2O Process').
 -include("n2o.hrl").
 -behaviour(gen_server).
 -export([start_link/1]).
