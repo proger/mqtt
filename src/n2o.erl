@@ -4,8 +4,22 @@
 -behaviour(application).
 -include("n2o.hrl").
 -include("emqttd.hrl").
--compile(export_all).
--export([start/2, stop/1, init/1, proc/2]).
+%-compile(export_all).
+-export([start/2, stop/1, init/1, proc/2]).   % async
+-export([ring/0,send_reply/3,send_reply/4]).  % mqtt
+-export([send/2,reg/1,unreg/1,reg/2]).        % mq
+-export([pickle/1,depickle/1]).               % pickle
+-export([encode/1,decode/1]).                 % format
+-export([info/3,warning/3,error/3]).          % log
+-export([session/1,session/2,user/1,user/0]). % session
+-export([cache/2,cache/3,cache/4,invalidate_cache/1]).               % cache
+-export([erroring/0,stack/2,erroring/2,stack_trace/2,error_page/2]). % error
+-export([to_binary/1,get_vnode/1,get_vnode/2,validate/1,subscribe/3,subscribe/2,
+         unsubscribe/3,unsubscribe/2,subscribe_cli/2,unsubscribe_cli/2]).
+-export([on_client_connected/3, on_client_disconnected/3, on_client_subscribe/4,
+         on_client_unsubscribe/4, on_session_created/3, on_session_subscribed/4,
+         on_session_unsubscribed/4, on_session_terminated/4, on_message_publish/2,
+         on_message_delivered/4, on_message_acked/4, bench/0 ]).
 
 %% N2O-MQTT Topic Format
 %%
@@ -167,38 +181,7 @@ cache(Tab, Key) ->
 
 % Context Variables and URL Query Strings from ?REQ and ?CTX n2o:q/1 n2o:qc/[1,2]
 
-q(Key) -> Val = get(Key), case Val of undefined -> qc(Key); A -> A end.
-qc(Key) -> CX = get(context), qc(Key,CX).
-qc(Key,Ctx) -> proplists:get_value(n2o:to_binary([Key]),Ctx#cx.params).
-
-atom(List) when is_list(List) -> list_to_atom(string:join([ lists:concat([L]) || L <- List],"_"));
-atom(Scalar) -> list_to_atom(lists:concat([Scalar])).
-
-% These api are not really API
-
-temp_id() -> "auto" ++ integer_to_list(erlang:unique_integer() rem 1000000).
-append(List, Key, Value) -> case Value of undefined -> List; _A -> [{Key, Value}|List] end.
-render(X) -> wf_render:render(X).
-
 version() -> proplists:get_value(vsn,element(2,application:get_all_key(n2o))).
-
-keyset(Name,Pos,List,New) ->
-    case lists:keyfind(Name,Pos,List) of
-        false -> [New|List];
-        _Element -> lists:keyreplace(Name,Pos,List,New) end.
-
-actions() -> get(actions).
-actions(Ac) -> put(actions,Ac).
-
-clear_actions() -> put(actions,[]).
-add_action(Action) ->
-    Actions = case get(actions) of undefined -> []; E -> E end,
-    put(actions,Actions++[Action]).
-
-fold(Fun,Handlers,Ctx) ->
-    lists:foldl(fun({_,Module},Ctx1) ->
-        {ok,_,NewCtx} = Module:Fun([],Ctx1),
-        NewCtx end,Ctx,Handlers).
 
 stack_trace(Error, Reason) ->
     Stacktrace = [case A of
