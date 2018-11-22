@@ -173,5 +173,7 @@ to_binary(L) when is_list(L) ->  iolist_to_binary(L).
 
 %
 
-version() -> proplists:get_value(vsn,element(2,application:get_all_key(n2o))).
+version() -> proplists:get_value(vsn,
+             element(2,application:get_all_key(n2o))).
 
+% END
