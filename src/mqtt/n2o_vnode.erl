@@ -1,7 +1,7 @@
 -module(n2o_vnode).
 -description('N2O MQTT Backend').
 -include("n2o.hrl").
--compile(export_all).
+-export([proc/2]).
 
 % N2O VNODE SERVER for MQTT
 

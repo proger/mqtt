@@ -4,13 +4,19 @@
 -behaviour(application).
 -include("n2o.hrl").
 -include("emqttd.hrl").
--export([start/2, stop/1, init/1, proc/2]).   % async
+
+% SERVICES
+
+-export([start/2, stop/1, init/1, proc/2]).   % supervision
 -export([ring/0,send_reply/3,send_reply/4]).  % mqtt
 -export([send/2,reg/1,unreg/1,reg/2]).        % mq
 -export([pickle/1,depickle/1]).               % pickle
 -export([encode/1,decode/1]).                 % format
 -export([info/3,warning/3,error/3]).          % log
 -export([session/1,session/2,user/1,user/0]). % session
+
+% BUILT-IN BACKENDS
+
 -export([cache/2,cache/3,cache/4,invalidate_cache/1]).               % cache
 -export([erroring/0,stack/2,erroring/2,stack_trace/2,error_page/2]). % error
 -export([to_binary/1,get_vnode/1,get_vnode/2,validate/1,subscribe/3,subscribe/2,

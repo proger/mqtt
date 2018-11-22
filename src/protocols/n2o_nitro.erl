@@ -1,7 +1,7 @@
 -module(n2o_nitro).
 -description('N2O Nitro Protocol').
 -include("n2o.hrl").
--compile(export_all).
+-export([info/3]).
 
 % Nitrogen pickle handler
 
