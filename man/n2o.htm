@@ -213,7 +213,9 @@
       {reply,{bert,{io,nitro:jse(Code),<<>>}}, Req, State};
         </code></figure>
         <h4>encode(record()) -> binary().</h4>
+        <p>Serializes a record.</p>
         <h4>decode(binary()) -> record().</h4>
+        <p>Deserializes a record.</p>
         <p>Here is an example of <b>n2o_bert</b> formatter implementation.</P>
         <figure><code>
  encode(Erl) -> term_to_binary(Erl).
@@ -229,20 +231,19 @@
         </code></figure>
         <p>In your code, you should use the following trace functions
            which are the same as callback API for n2o logging environment variable.</p>
-        <h4>error(Module, Format, Args) -> ok | skip.</h4>
         <h4>info(Module, Format, Args) -> ok | skip.</h4>
+        <p>Use this function for info message.</p>
         <h4>warning(Module, Format, Args) -> ok | skip.</h4>
+        <p>Use this function for warning messages.</p>
+        <h4>error(Module, Format, Args) -> ok | skip.</h4>
+        <p>Use this function for printing errors.</p>
     </section>
     <section>
         <h3>SESSION</h3>
-        <p>Sessions are stored in <b>cookies</b> table and indexed by security token which
-        is usually a password based token. All session variables from all users are stored in this table.
-        each user see only its variables indexed by his token. Sessions like a cache are expirable.
-        Technically, N2O sessions are the server controlling mechanism of JavaScript cookies.</p>
+        <p>Sessions are stored in issued tokens encripted with AES/CBC-128.
+           All session variables are cached in ETS table.</p>
         <h4>session(Key, Value) -> term().</h4>
-        <p>Sets a Value into ETS table <b>cookies</b> for a token from #cx.session which
-        is set there earlier from INIT message or MQTT headers,
-        before entering the top level N2O loop.</p>
+        <p>Sets a value to session variable.</p>
         <figure><figcaption>Listing 8. Sessions</figcaption><code>
  1> rr(n2o).
  [bin,client,cx,direct,ev,flush,ftp,ftpack,handler,
@@ -256,13 +257,14 @@
  {{<<"5842b7e749a8cf44c920">>,auth},{63710014069,[]}]
         </code></figure>
         <h4>session(Key) -> term().</h4>
-        <p>Gets a Value by any Key.</p>
+        <p>Gets a value of session variable.</p>
     </section>
     <section>
         <h3>PICKLE</h3>
-        <p>Call this function for changeable at runtime term pickling.</p>
         <h4>pickle(term()) -> binary().</h4>
+        <p>Custom Erlang term serialization.</p>
         <h4>depickle(binary()) -> term().</h4>
+        <p>Custom Erlang term deserialization.</p>
     </section>
     <section>
         <p>This module may refer to:
