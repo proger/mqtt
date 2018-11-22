@@ -4,7 +4,6 @@
 -behaviour(application).
 -include("n2o.hrl").
 -include("emqttd.hrl").
-%-compile(export_all).
 -export([start/2, stop/1, init/1, proc/2]).   % async
 -export([ring/0,send_reply/3,send_reply/4]).  % mqtt
 -export([send/2,reg/1,unreg/1,reg/2]).        % mq

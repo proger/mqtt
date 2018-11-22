@@ -1,8 +1,7 @@
 -module(n2o_proto).
 -description('N2O Proto Loop').
 -include("n2o.hrl").
--compile(export_all).
--export([info/3, stream/3, push/5]).
+-export([info/3, stream/3, push/5, init/4, terminate/2]).
 
 formatter(O)       -> case lists:keyfind(formatter,1,O) of {formatter,F} -> F; X -> X end.
 protocols()        -> application:get_env(n2o,protocols,[ n2o_nitro ]).
