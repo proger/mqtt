@@ -49,7 +49,7 @@ info(#ftp{id = Link, status = <<"init">>, block = Block, offset = Offset}=FTP, R
 info(#ftp{id = Link, status = <<"send">>}=FTP, Req, State) ->
     n2o:info(?MODULE,"FTP INFO SEND: ~p~n",[ FTP#ftp{data = <<>>, sid = <<>>} ]),
     Reply = try
-        n2o_async:send(file, Link, FTP#ftp{sid = <<>>})
+        n2o_async:send(file, Link, FTP)
     catch E:R ->
         n2o:error(?MODULE,"FTP ERROR: ~p~n",[ {E,R} ]),
         FTP#ftp{data = <<>>,sid = <<>>, block = ?STOP}
@@ -63,7 +63,7 @@ info(Message, Req, State) -> {unknown, Message, Req, State}.
 proc(init, #handler{name = Link, state = #ftp{sid = Sid, meta = ClientId} = FTP} = Async) ->
     {ok, Async};
 
-proc(#ftp{sid = Sid, data = Data, status = <<"send">>, block = Block, meta = ClientId} = FTP,
+proc(#ftp{sid = Token, data = Data, status = <<"send">>, block = Block, meta = ClientId} = FTP,
      #handler{name = Link, state = #ftp{size = TotalSize, offset = Offset, filename = RelPath}} = Async)
      when Offset + Block >= TotalSize ->
         n2o:info(?MODULE,"FTP PROC FINALE: ~p~n", [ Link ]),
@@ -74,8 +74,10 @@ proc(#ftp{sid = Sid, data = Data, status = <<"send">>, block = Block, meta = Cli
             ok ->
                 FTP2 = FTP#ftp{data = <<>>, sid = <<>>,offset = TotalSize, block = ?STOP},
                 FTP3 = FTP2#ftp{status = {event, stop}, filename = RelPath},
-                spawn(fun() -> n2o_ring:send({publish, <<"events/1//index/anon/",ClientId/binary,"/",Sid/binary>>,
-                                        term_to_binary(FTP3)}) end),
+                spawn(fun() -> catch n2o_ring:send({publish, <<"events/1//index/anon/",ClientId/binary,"/",Token/binary>>,
+                                        term_to_binary(FTP3)}),
+                               Sid = case n2o:depickle(Token) of {{S,_},_} -> S; X -> X end,
+                               catch n2o:send(Sid,FTP3) end),
                 spawn(fun() -> n2o_async:stop(file, Link) end),
                 {stop, normal, FTP2, Async#handler{state = FTP2}}
         end;
