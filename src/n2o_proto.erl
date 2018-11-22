@@ -3,7 +3,6 @@
 -include("n2o.hrl").
 -export([info/3, stream/3, push/5, init/4, terminate/2]).
 
-formatter(O)       -> case lists:keyfind(formatter,1,O) of {formatter,F} -> F; X -> X end.
 protocols()        -> application:get_env(n2o,protocols,[ n2o_nitro ]).
 info(M,R,S)        -> filter(M,R,S,protocols(),[]).
 filter(M,R,S,P,A)  -> {Mod,Fun} = (application:get_env(n2o,filter,{?MODULE,push})),

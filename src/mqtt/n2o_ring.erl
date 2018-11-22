@@ -1,7 +1,7 @@
 -module(n2o_ring).
 -description('N2O Ring').
 -include("n2o.hrl").
--export([ring_list/0,ring/0,init/1,send/1,lookup/1,lookup_index/1,add/1,delete/1]).
+-export([ring/0,init/1,send/1,lookup/1,add/1,delete/1]).
 -record(state, { ring, nodes }).
 
 send(Msg) ->

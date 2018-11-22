@@ -1,7 +1,7 @@
 -module(n2o_session).
 -include_lib("stdlib/include/ms_transform.hrl").
 -description('N2O Session').
--export([authenticate/2, get_value/3, set_value/3, storage/0, prolongate/0, from/1]).
+-export([authenticate/2, get_value/3, set_value/3, storage/0, prolongate/0, from/1, ttl/0, till/2]).
 -export([clear/1, delete/1, update/1, lookup/1, invalidate_sessions/0]).
 
 % PRELUDE
