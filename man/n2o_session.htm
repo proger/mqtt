@@ -32,15 +32,17 @@
     </section>
     <section>
         <h3>TYPES</h3>
-        <p>Session token encoded with N2O pickler.</p>
-        <figure><code>
- -type token() :: { 'Token', binary() }.
-        </code></figure>
-        <p>Session id and variable encoded with N2O pickler.</p>
+        <p>Session token represents tuple cached in ETS.
+           It consists of session id, key, expiration time and value.
+           Session token used both for auth and for session variales.</p>
         <figure><code>
  -type session_sid() :: binary().
  -type session_key() :: { session_sid(), term() }.
  -type session() :: { session_key() , { integer(), term() } }.
+        </code></figure>
+        <p>Session token encoded with pickler tagged as <b>'Token'</b> tuple.</p>
+        <figure><code>
+ -type token() :: { 'Token', binary() }.
         </code></figure>
     </section>
     <section>
