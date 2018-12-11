@@ -2,6 +2,10 @@
 -module(genbert).
 -compile([export_all]).
 
+% usage:
+% ./bert_gen.erl > bert.data
+% node bert_test.js
+
 object(D)   ->
     case crypto:rand_uniform(0,5) of
          0 -> tuple(D);
