@@ -3,7 +3,16 @@
     <!-- Generator: Sketch 3.3.1 (12002) - http://www.bohemiancoding.com/sketch -->
     <title>WebSocket + MQTT</title>
     <desc>Created with Sketch.</desc>
-    <defs></defs>
+    <defs>
+  <style type="text/css">
+   <![CDATA[
+    @font-face {
+        font-family: Geometria;
+        src: url('https://synrc.space/Geometria-Light.otf');
+    }
+   ]]>
+ </style>
+    </defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
         <g id="WebSocket-+-MQTT" sketch:type="MSLayerGroup" transform="translate(-3.000000, 0.000000)">
             <g id="WebSocket">
