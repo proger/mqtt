@@ -5,12 +5,11 @@
     <desc>Created with Sketch.</desc>
     <defs>
   <style type="text/css">
-   <![CDATA[
     @font-face {
         font-family: Geometria;
         src: url('https://synrc.space/Geometria-Light.otf');
     }
-   ]]>
+    text { font-family: Geometria; }
  </style>
     </defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
