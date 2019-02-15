@@ -34,7 +34,8 @@ var $io = {}; $io.on = function onio(r, cb) {
         try { eval(utf8_arr(r.v[1].v));
               if (typeof cb == 'function') cb(r);
               return { status: "ok" };
-        } catch (e)  { console.log("Eval error: "+r);
+        } catch (e)  { console.error("Eval failed:",r);
+                       console.error(e);
                        return { status: '' }; }
     } else return { status: '' };
 }
