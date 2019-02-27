@@ -48,20 +48,17 @@ var $file = {}; $file.on = function onfile(r, cb) {
 // BERT Formatter
 
 var $bert = {}; $bert.protos = [$io, $file]; $bert.on = function onbert(evt, cb) {
-    if (Blob.prototype.isPrototypeOf(evt.data) &&
-       (evt.data.length > 0 || evt.data.size > 0)) {
-        var r = new FileReader();
-        r.addEventListener("loadend", function () {
-            try {
-                erlang = dec(r.result);
-                if (typeof cb == 'function') cb(erlang);
-                for (var i = 0; i < $bert.protos.length; i++) {
-                    p = $bert.protos[i];
-                    if (p.on(erlang, p.do).status == "ok") return;
-                }
-            } catch (e) { console.log(e); }
-        });
-        r.readAsArrayBuffer(evt.data);
+    if (ArrayBuffer.prototype.isPrototypeOf(evt.data) &&
+       (evt.data.byteLength > 0)) {
+        try {
+            var erlang = dec(evt.data);
+            if (typeof cb == 'function') cb(erlang);
+            for (var i = 0; i < $bert.protos.length; i++) {
+                p = $bert.protos[i];
+                var pret = p.on(erlang, p.do);
+                if (pret.status == "ok") return pret;
+            }
+        } catch (e) { console.error(e); }
         return { status: "ok" };
     } else return { status: "error", desc: "data" };
 }
